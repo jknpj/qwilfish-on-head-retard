@@ -74,13 +74,6 @@
 	src.adding += using
 	action_intent = using
 
-//Cell
-	mymob:cells = getFromPool(/obj/abstract/screen)
-	mymob:cells.icon = 'icons/mob/screen1_robot.dmi'
-	mymob:cells.icon_state = "charge-empty"
-	mymob:cells.name = "cell"
-	mymob:cells.screen_loc = ui_toxin
-
 //Health
 	mymob.healths = getFromPool(/obj/abstract/screen)
 	mymob.healths.icon = 'icons/mob/screen1_robot.dmi'
@@ -110,33 +103,6 @@
 	mymob.throw_icon.icon_state = "store"
 	mymob.throw_icon.name = "store"
 	mymob.throw_icon.screen_loc = ui_borg_store
-
-//Temp
-	mymob.bodytemp = getFromPool(/obj/abstract/screen)
-	mymob.bodytemp.icon = 'icons/mob/screen1_robot.dmi'
-	mymob.bodytemp.icon_state = "temp0"
-	mymob.bodytemp.name = "environment temperature"
-	mymob.bodytemp.screen_loc = ui_borg_temp
-	
-//Pressure
-	mymob.pressure = getFromPool(/obj/abstract/screen)
-	mymob.pressure.icon = 'icons/mob/screen1_robot.dmi'
-	mymob.pressure.icon_state = "pressure0"
-	mymob.pressure.name = "environment pressure"
-	mymob.pressure.screen_loc = ui_borg_pressure
-
- //unused, go home
-	mymob.oxygen = getFromPool(/obj/abstract/screen)
-	mymob.oxygen.icon = 'icons/mob/screen1_robot.dmi'
-	mymob.oxygen.icon_state = "oxy0"
-	mymob.oxygen.name = "oxygen"
-	mymob.oxygen.screen_loc = ui_oxygen
-
-	mymob.fire = getFromPool(/obj/abstract/screen)
-	mymob.fire.icon = 'icons/mob/screen1_robot.dmi'
-	mymob.fire.icon_state = "fire0"
-	mymob.fire.name = "fire"
-	mymob.fire.screen_loc = ui_fire
 
 	mymob.pullin = getFromPool(/obj/abstract/screen)
 	mymob.pullin.icon = 'icons/mob/screen1_robot.dmi'
@@ -171,7 +137,7 @@
 
 	mymob.client.reset_screen()
 
-	mymob.client.screen += list( mymob.throw_icon, mymob.zone_sel, mymob.fire, mymob.pressure, mymob.bodytemp, mymob.hands, mymob.healths, mymob:cells, mymob.pullin, mymob.gun_setting_icon) //, mymob.rest, mymob.sleep, mymob.mach, mymob.oxygen)
+	mymob.client.screen += list( mymob.throw_icon, mymob.zone_sel, mymob.hands, mymob.healths, mymob.pullin, mymob.gun_setting_icon)
 	mymob.client.screen += src.adding + src.other
 
 	return

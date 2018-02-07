@@ -72,22 +72,17 @@
 #define ui_gun3 "EAST-2:26,SOUTH+3:7" //Used as compile time value
 #define ui_gun_select "EAST-1:28,SOUTH+2:7" //Used as compile time value
 
-//Upper-middle right (damage indicators)
-#define ui_toxin "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-2:[27*PIXEL_MULTIPLIER]"
-#define ui_fire "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-3:[25*PIXEL_MULTIPLIER]"
-#define ui_oxygen "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-4:[23*PIXEL_MULTIPLIER]"
-#define ui_pressure "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-5:[21*PIXEL_MULTIPLIER]"
-
-#define ui_alien_toxin "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-2:[25*PIXEL_MULTIPLIER]"
-#define ui_alien_fire "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-3:[25*PIXEL_MULTIPLIER]"
-#define ui_alien_oxygen "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-4:[25*PIXEL_MULTIPLIER]"
+//Upper-middle right (alerts)
+#define ui_alert1 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+5:[27*PIXEL_MULTIPLIER]"
+#define ui_alert2 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+4:[25*PIXEL_MULTIPLIER]"
+#define ui_alert3 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+3:[23*PIXEL_MULTIPLIER]"
+#define ui_alert4 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+2:[21*PIXEL_MULTIPLIER]"
+#define ui_alert5 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+1:[19*PIXEL_MULTIPLIER]"
 
 //Middle right (status indicators)
-#define ui_nutrition "EAST-1:[28*PIXEL_MULTIPLIER],CENTER-2:[11*PIXEL_MULTIPLIER]"
-#define ui_temp "EAST-1:[28*PIXEL_MULTIPLIER],CENTER-1:[13*PIXEL_MULTIPLIER]"
 #define ui_health "EAST-1:[28*PIXEL_MULTIPLIER],CENTER:[15*PIXEL_MULTIPLIER]"
 #define ui_internal "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+1:[17*PIXEL_MULTIPLIER]"
-									//borgs
+//borgs
 #define ui_borg_temp "EAST-1:[28*PIXEL_MULTIPLIER],CENTER-1:[13*PIXEL_MULTIPLIER]" //same as humans
 #define ui_borg_pressure "EAST-1:[28*PIXEL_MULTIPLIER],CENTER:[15*PIXEL_MULTIPLIER]" //borg pressure-o-meter goes in the health slot
 #define ui_borg_health "EAST-1:[28*PIXEL_MULTIPLIER],NORTH-5:[21*PIXEL_MULTIPLIER]" //borgs have the health display where humans have the pressure damage indicator.

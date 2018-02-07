@@ -2,12 +2,6 @@
 
 //How to copypaste human life code and pretend it won't fuck up everything for ALIEN LARVAE : The Novel : The Story : The Legend : The Epic : The Game
 //But seriously, someone's gonna have to look more in depth into this to get rid of useless shit
-
-/mob/living/carbon/alien/larva
-
-	var/temperature_alert = 0
-
-
 /mob/living/carbon/alien/larva/Life()
 	set invisibility = 0
 	//set background = 1
@@ -167,12 +161,12 @@
 	if(Toxins_pp) // Detect toxins in air
 
 		AdjustPlasma(breath.toxins*250)
-		toxins_alert = max(toxins_alert, 1)
+		throw_alert("tox_in_air")
 
 		toxins_used = breath.toxins
 
 	else
-		toxins_alert = 0
+		clear_alert("tox_in_air")
 
 	//Breathe in toxins and out oxygen
 	breath.toxins -= toxins_used
@@ -181,11 +175,9 @@
 	if(breath.temperature > (T0C+66) && !(M_RESIST_HEAT in mutations)) // Hot air hurts :(
 		if(prob(20))
 			to_chat(src, "<span class='danger'>You feel a searing heat in your lungs !</span>")
-		fire_alert = max(fire_alert, 1)
+		throw_alert("temp","hot",1)
 	else
-		fire_alert = 0
-
-	//Temporary fixes to the alerts.
+		clear_alert("temp")
 
 	return 1
 
@@ -336,15 +328,6 @@
 
 	update_pull_icon()
 
-
-	if (toxin)
-		toxin.icon_state = "tox[toxins_alert ? 1 : 0]"
-	if (oxygen)
-		oxygen.icon_state = "oxy[oxygen_alert ? 1 : 0]"
-	if (fire)
-		fire.icon_state = "fire[fire_alert ? 1 : 0]"
-	//NOTE: the alerts dont reset when youre out of danger. dont blame me,
-	//blame the person who coded them. Temporary fix added.
 	if (client)
 		clear_fullscreens()
 

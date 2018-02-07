@@ -185,83 +185,21 @@
 							else
 								healths.icon_state = "health6"
 
-		if(nutrition_icon)
-			switch(nutrition)
-				if(450 to INFINITY)
-					nutrition_icon.icon_state = "nutrition0"
-				if(350 to 450)
-					nutrition_icon.icon_state = "nutrition1"
-				if(250 to 350)
-					nutrition_icon.icon_state = "nutrition2"
-				if(150 to 250)
-					nutrition_icon.icon_state = "nutrition3"
-				else
-					nutrition_icon.icon_state = "nutrition4"
+		switch(nutrition)
+			if(450 to INFINITY)
+				throw_alert("nutrition","fat")
+			if(250 to 350)
+				clear_alert("nutrition")
+			if(150 to 250)
+				throw_alert("nutrition","hungry")
+			else
+				throw_alert("nutrition","starving")
 
-			if(ticker && ticker.hardcore_mode) //Hardcore mode: flashing nutrition indicator when starving!
-				if(nutrition < STARVATION_MIN)
-					nutrition_icon.icon_state = "nutrition5"
-
-		if(pressure)
-			pressure.icon_state = "pressure[pressure_alert]"
+		if(ticker && ticker.hardcore_mode) //Hardcore mode: flashing nutrition indicator when starving!
+			if(nutrition < STARVATION_MIN)
+				throw_alert("nutrition","starving")
 
 		update_pull_icon()
-//			if(rest) //Not used with new UI
-//				if(resting || lying || sleeping)		rest.icon_state = "rest1"
-//				else									rest.icon_state = "rest0"
-		if(toxin)
-			if(hal_screwyhud == 4 || toxins_alert)
-				toxin.icon_state = "tox1"
-			else
-				toxin.icon_state = "tox0"
-		if(oxygen)
-			if(hal_screwyhud == 3 || oxygen_alert)
-				oxygen.icon_state = "oxy1"
-			else
-				oxygen.icon_state = "oxy0"
-		if(fire)
-			if(fire_alert)
-				fire.icon_state = "fire[fire_alert]" //fire_alert is either 0 if no alert, 1 for cold and 2 for heat.
-			else
-				fire.icon_state = "fire0"
-
-		if(bodytemp)
-			if(has_reagent_in_blood(CAPSAICIN))
-				bodytemp.icon_state = "temp4"
-			else if(has_reagent_in_blood(FROSTOIL))
-				bodytemp.icon_state = "temp-4"
-			else if(!(get_thermal_loss(loc.return_air()) > 0.1) || bodytemperature > T0C + 50)
-				switch(bodytemperature) //310.055 optimal body temp
-					if(370 to INFINITY)
-						bodytemp.icon_state = "temp4"
-					if(350 to 370)
-						bodytemp.icon_state = "temp3"
-					if(335 to 350)
-						bodytemp.icon_state = "temp2"
-					if(320 to 335)
-						bodytemp.icon_state = "temp1"
-					if(305 to 320)
-						bodytemp.icon_state = "temp0"
-					if(303 to 305)
-						bodytemp.icon_state = "temp-1"
-					if(300 to 303)
-						bodytemp.icon_state = "temp-2"
-					if(290 to 295)
-						bodytemp.icon_state = "temp-3"
-					if(0   to 290)
-						bodytemp.icon_state = "temp-4"
-			else if(is_vessel_dilated() && undergoing_hypothermia() == MODERATE_HYPOTHERMIA)
-				bodytemp.icon_state = "temp4" // yes, this is intentional - this is the cause of "paradoxical undressing", ie feeling 2hot when hypothermic
-			else
-				switch(get_thermal_loss(loc.return_air())) // How many degrees of celsius we are losing per tick.
-					if(0.1 to 0.15)
-						bodytemp.icon_state = "temp-1"
-					if(0.15 to 0.2)
-						bodytemp.icon_state = "temp-2"
-					if(0.2 to 0.4)
-						bodytemp.icon_state = "temp-3"
-					if(0.4 to INFINITY)
-						bodytemp.icon_state = "temp-4"
 
 		if(disabilities & NEARSIGHTED)	//This looks meh but saves a lot of memory by not requiring to add var/prescription
 			if(glasses)	//To every /obj/item

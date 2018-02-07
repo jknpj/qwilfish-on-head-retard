@@ -19,15 +19,10 @@
 	var/obj/abstract/screen/visible = null
 	var/obj/abstract/screen/purged = null
 	var/obj/abstract/screen/internals = null
-	var/obj/abstract/screen/oxygen = null
 	var/obj/abstract/screen/i_select = null
 	var/obj/abstract/screen/m_select = null
-	var/obj/abstract/screen/toxin = null
-	var/obj/abstract/screen/fire = null
-	var/obj/abstract/screen/bodytemp = null
 	var/obj/abstract/screen/healths = null
 	var/obj/abstract/screen/throw_icon = null
-	var/obj/abstract/screen/nutrition_icon = null
 	var/obj/abstract/screen/pressure = null
 	var/obj/abstract/screen/damageoverlay = null
 	var/obj/abstract/screen/pain = null

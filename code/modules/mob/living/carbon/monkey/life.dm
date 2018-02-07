@@ -1,12 +1,7 @@
 
 
 /mob/living/carbon/monkey
-	var/oxygen_alert = 0
-	var/toxins_alert = 0
-	var/fire_alert = 0
-	var/pressure_alert = 0
 	base_insulation = 0.5
-	var/temperature_alert = 0
 	var/safe_oxygen_min = 16 // Minimum safe partial pressure of O2, in kPa
 
 
@@ -318,7 +313,7 @@
 	if(!breath || (breath.total_moles == 0))
 		adjustOxyLoss(7)
 
-		oxygen_alert = max(oxygen_alert, 1)
+		throw_alert("oxy")
 
 		return 0
 
@@ -347,17 +342,11 @@
 		var/ratio = safe_oxygen_min/O2_pp
 		adjustOxyLoss(min(5*ratio, 7)) // Don't fuck them up too fast (space only does 7 after all!)
 		oxygen_used = breath.oxygen*ratio/6
-		oxygen_alert = max(oxygen_alert, 1)
-	/*else if (O2_pp > safe_oxygen_max) 		// Too much oxygen (commented this out for now, I'll deal with pressure damage elsewhere I suppose)
-		spawn(0) emote("cough")
-		var/ratio = O2_pp/safe_oxygen_max
-		oxyloss += 5*ratio
-		oxygen_used = breath.oxygen*ratio/6
-		oxygen_alert = max(oxygen_alert, 1)*/
+		throw_alert("oxy")
 	else 									// We're in safe limits
 		adjustOxyLoss(-5)
 		oxygen_used = breath.oxygen/6
-		oxygen_alert = 0
+		clear_alert("oxy")
 
 	breath.oxygen -= oxygen_used
 	breath.carbon_dioxide += oxygen_used
@@ -388,9 +377,9 @@
 		if(ratio)
 			if(reagents)
 				reagents.add_reagent(PLASMA, Clamp(ratio, MIN_PLASMA_DAMAGE, MAX_PLASMA_DAMAGE))
-			toxins_alert = max(toxins_alert, 1)
+			throw_alert("tox_in_air")
 	else
-		toxins_alert = 0
+		clear_alert("tox_in_air")
 
 	if(breath.trace_gases.len)	// If there's some other shit in the air lets deal with it here.
 		for(var/datum/gas/sleeping_agent/SA in breath.trace_gases)
@@ -407,12 +396,9 @@
 	if(breath.temperature > (T0C+66)) // Hot air hurts :(
 		if(prob(20))
 			to_chat(src, "<span class='warning'>You feel a searing heat in your lungs!</span>")
-		fire_alert = max(fire_alert, 2)
+		throw_alert("temp","hot",1)
 	else
-		fire_alert = 0
-
-
-	//Temporary fixes to the alerts.
+		clear_alert("temp")
 
 	return 1
 
@@ -482,21 +468,21 @@
 	switch(adjusted_pressure)
 		if(HAZARD_HIGH_PRESSURE to INFINITY)
 			adjustBruteLoss( min( ( (adjusted_pressure / HAZARD_HIGH_PRESSURE) -1 )*PRESSURE_DAMAGE_COEFFICIENT , MAX_HIGH_PRESSURE_DAMAGE) )
-			pressure_alert = 2
+			throw_alert("pressure","highpressure",2)
 		if(WARNING_HIGH_PRESSURE to HAZARD_HIGH_PRESSURE)
-			pressure_alert = 1
+			throw_alert("pressure","highpressure",1)
 		if(WARNING_LOW_PRESSURE to WARNING_HIGH_PRESSURE)
-			pressure_alert = 0
+			clear_alert("pressure")
 		if(HAZARD_LOW_PRESSURE to WARNING_LOW_PRESSURE)
 			if(!spaceproof)
-				pressure_alert = -1
+				throw_alert("pressure","lowpressure",1)
 		else
 			if(!spaceproof)
 				if( !(M_RESIST_COLD in mutations) )
 					adjustBruteLoss( LOW_PRESSURE_DAMAGE )
-					pressure_alert = -2
+					throw_alert("pressure","lowpressure",2)
 				else
-					pressure_alert = -1
+					throw_alert("pressure","lowpressure",1)
 
 	return
 
@@ -684,41 +670,10 @@
 			healths.icon_state = "health7"
 
 
-	if(pressure)
-		pressure.icon_state = "pressure[pressure_alert]"
-
 	update_pull_icon()
 
-
-	if (toxin)
-		toxin.icon_state = "tox[toxins_alert ? 1 : 0]"
-	if (oxygen)
-		oxygen.icon_state = "oxy[oxygen_alert ? 1 : 0]"
-	if (fire)
-		fire.icon_state = "fire[fire_alert ? 2 : 0]"
 	//NOTE: the alerts dont reset when youre out of danger. dont blame me,
 	//blame the person who coded them. Temporary fix added.
-
-	if(bodytemp)
-		switch(bodytemperature) //310.055 optimal body temp
-			if(345 to INFINITY)
-				bodytemp.icon_state = "temp4"
-			if(335 to 345)
-				bodytemp.icon_state = "temp3"
-			if(327 to 335)
-				bodytemp.icon_state = "temp2"
-			if(316 to 327)
-				bodytemp.icon_state = "temp1"
-			if(300 to 316)
-				bodytemp.icon_state = "temp0"
-			if(295 to 300)
-				bodytemp.icon_state = "temp-1"
-			if(280 to 295)
-				bodytemp.icon_state = "temp-2"
-			if(260 to 280)
-				bodytemp.icon_state = "temp-3"
-			else
-				bodytemp.icon_state = "temp-4"
 
 	if(stat != DEAD)
 		if(src.eye_blind || blinded)

@@ -385,11 +385,6 @@
 
 
 /mob/living/simple_animal/construct/regular_hud_updates()
-	if(fire)
-		if(fire_alert)
-			fire.icon_state = "fire1"
-		else
-			fire.icon_state = "fire0"
 	update_pull_icon()
 
 	if(purged)

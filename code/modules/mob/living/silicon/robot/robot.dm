@@ -21,7 +21,6 @@
 
 //Hud stuff
 
-	var/obj/abstract/screen/cells = null
 	var/obj/abstract/screen/inv1 = null
 	var/obj/abstract/screen/inv2 = null
 	var/obj/abstract/screen/inv3 = null
@@ -204,11 +203,6 @@
 
 /mob/living/silicon/robot/remove_screen_objs()
 	..()
-	if(cells)
-		returnToPool(cells)
-		if(client)
-			client.screen -= cells
-		cells = null //TODO: Move to mob level helper
 	if(inv1)
 		returnToPool(inv1)
 		if(client)

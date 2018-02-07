@@ -192,18 +192,6 @@
 	mymob.bodytemp.screen_loc = ui_temp
 
 //does nothing (fire and oxy)
-	mymob.oxygen = new /obj/screen( null )
-	mymob.oxygen.icon = 'icons/mob/screen1_robot.dmi'
-	mymob.oxygen.icon_state = "oxy0"
-	mymob.oxygen.name = "oxygen"
-	mymob.oxygen.screen_loc = ui_oxygen
-
-	mymob.fire = new /obj/screen( null )
-	mymob.fire.icon = 'icons/mob/screen1_robot.dmi'
-	mymob.fire.icon_state = "fire0"
-	mymob.fire.name = "fire"
-	mymob.fire.screen_loc = ui_fire
-
 	mymob.pullin = new /obj/screen( null )
 	mymob.pullin.icon = 'icons/mob/screen1_robot.dmi'
 	mymob.pullin.icon_state = "pull0"

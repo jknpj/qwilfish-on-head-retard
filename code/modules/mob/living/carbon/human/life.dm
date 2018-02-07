@@ -73,12 +73,7 @@ var/global/list/organ_damage_overlays = list(
 	"groin_max" = image("icon" = 'icons/mob/organdmg.dmi', "icon_state" = "groin_max", "layer" = 21),\
 	"groin_gone" = image("icon" = 'icons/mob/organdmg.dmi', "icon_state" = "groin_gone", "layer" = 21))
 /mob/living/carbon/human
-	var/oxygen_alert = 0
-	var/toxins_alert = 0
-	var/fire_alert = 0
-	var/pressure_alert = 0
 	var/prev_gender = null // Debug for plural genders
-	var/temperature_alert = 0
 	var/in_stasis = 0
 	var/do_deferred_species_setup=0
 	var/exposedtimenow = 0
@@ -120,7 +115,6 @@ var/global/list/organ_damage_overlays = list(
 	//get reset each cycle and then get activated later in the code.
 	//Very ugly. I dont care. Moving this stuff here so its easy to find it.
 	blinded = null
-	fire_alert = 0 //Reset this here, because both breathe() and handle_environment() have a chance to set it.
 
 	//TODO: seperate this out
 	//Update the current life tick, can be used to e.g. only do something every 4 ticks

@@ -149,7 +149,7 @@
 		if(suiciding)
 			adjustOxyLoss(2) //If you are suiciding, you should die a little bit faster
 			failed_last_breath = 1
-			oxygen_alert = 1
+			throw_alert("oxy")
 			return 0
 		if(health > config.health_threshold_crit)
 			adjustOxyLoss(HUMAN_MAX_OXYLOSS)
@@ -158,7 +158,7 @@
 			adjustOxyLoss(HUMAN_CRIT_MAX_OXYLOSS)
 			failed_last_breath = 1
 
-		oxygen_alert = 1
+		throw_alert("oxy")
 
 		return 0
 

@@ -183,9 +183,9 @@
 				// H.reagents.add_reagent(PLASMA, Clamp(ratio, MIN_PLASMA_DAMAGE, MAX_PLASMA_DAMAGE))
 				// no this is bad n3x pls no
 				H.adjustToxLoss(Clamp(ratio, MIN_PLASMA_DAMAGE, MAX_PLASMA_DAMAGE))
-			H.toxins_alert = max(H.toxins_alert, 1)
+			H.throw_alert("tox_in_air")
 	else
-		H.toxins_alert = 0
+		H.clear_alert("tox_in_air")
 
 
 ////////////////////////

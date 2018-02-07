@@ -242,13 +242,13 @@ var/global/list/whitelisted_species = list("Human")
 		//testing("  we cool")
 		H.failed_last_breath = 0
 		H.adjustOxyLoss(-5)
-		H.oxygen_alert = 0
+		H.clear_alert("oxy")
 		return moles/GAS_CONSUME_TO_WASTE_DENOMINATOR
 	else
 		//testing("  ratio < 1, adding oxyLoss.")
 		H.adjustOxyLoss(min(5*ratio, HUMAN_MAX_OXYLOSS)) // Don't fuck them up too fast (space only does HUMAN_MAX_OXYLOSS after all!)
 		H.failed_last_breath = 1
-		H.oxygen_alert = 1
+		H.throw_alert("oxy")
 		return moles*ratio/GAS_CONSUME_TO_WASTE_DENOMINATOR
 
 // Used for species-specific names (Vox, etc)

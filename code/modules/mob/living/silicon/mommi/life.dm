@@ -185,28 +185,21 @@
 		if(static_overlays && static_overlays.len)
 			remove_static_overlays()
 
-	if (src.cells)
-		if (src.cell)
-			var/cellcharge = src.cell.charge/src.cell.maxcharge
-			switch(cellcharge)
-				if(0.75 to INFINITY)
-					src.cells.icon_state = "charge4"
-				if(0.5 to 0.75)
-					src.cells.icon_state = "charge3"
-				if(0.25 to 0.5)
-					src.cells.icon_state = "charge2"
-				if(0 to 0.25)
-					src.cells.icon_state = "charge1"
-				else
-					src.cells.icon_state = "charge0"
-		else
-			src.cells.icon_state = "charge-empty"
-
-	if(bodytemp) //actually environment temperature but fuck it
-		bodytemp.icon_state = "temp[temp_alert]"
-	if(pressure)
-		pressure.icon_state = "pressure[pressure_alert]"
-
+	if(src.cell)
+		var/cellcharge = src.cell.charge/src.cell.maxcharge
+		switch(cellcharge)
+			if(0.75 to INFINITY)
+				clear_alert("charge")
+			if(0.5 to 0.75)
+				throw_alert("charge","lowcell",1)
+			if(0.25 to 0.5)
+				throw_alert("charge","lowcell",2)
+			if(0 to 0.25)
+				throw_alert("charge","lowcell",3)
+			else
+				throw_alert("charge","emptycell")
+	else
+		throw_alert("charge","nocell")
 
 	update_pull_icon()
 //Oxygen and fire does nothing yet!!

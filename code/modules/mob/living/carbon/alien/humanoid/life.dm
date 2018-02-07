@@ -1,12 +1,3 @@
-
-
-/mob/living/carbon/alien/humanoid
-	oxygen_alert = 0
-	toxins_alert = 0
-	fire_alert = 0
-
-	var/temperature_alert = 0
-
 /mob/living/carbon/alien/humanoid/Life()
 	set invisibility = 0
 	//set background = 1
@@ -184,27 +175,15 @@
 		var/Toxins_pp = (breath.toxins/breath.total_moles())*breath_pressure
 
 		if(Toxins_pp) // Detect toxins in air
-
 			AdjustPlasma(breath.toxins*250)
-			toxins_alert = max(toxins_alert, 1)
-
+			throw_alert("alien_tox")
 			toxins_used = breath.toxins
-
 		else
-			toxins_alert = 0
+			clear_alert("alien_tox")
 
 		//Breathe in toxins and out oxygen
 		breath.toxins -= toxins_used
 		breath.oxygen += toxins_used
-
-		if(breath.temperature > (T0C+66) && !(M_RESIST_HEAT in mutations)) // Hot air hurts :(
-			if(prob(20))
-				to_chat(src, "<span class='warning'>You feel a searing heat in your lungs !</span>")
-			fire_alert = max(fire_alert, 1)
-		else
-			fire_alert = 0
-
-		//Temporary fixes to the alerts.
 
 		return 1
 
@@ -414,13 +393,6 @@
 
 		update_pull_icon()
 
-
-		if (toxin)
-			toxin.icon_state = "tox[toxins_alert ? 1 : 0]"
-		if (oxygen)
-			oxygen.icon_state = "oxy[oxygen_alert ? 1 : 0]"
-		if (fire)
-			fire.icon_state = "fire[fire_alert ? 1 : 0]"
 		//NOTE: the alerts dont reset when youre out of danger. dont blame me,
 		//blame the person who coded them. Temporary fix added.
 		if (client)
