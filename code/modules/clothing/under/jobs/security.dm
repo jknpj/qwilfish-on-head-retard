@@ -134,3 +134,10 @@
 	icon_state = "sundowner_coat_allblack"
 	item_state = "sundowner_coat_allblack"
 	siemens_coefficient = 0.6
+
+/obj/item/clothing/suit/armor/hos/sundowner/syndicate
+	name = "red sun armoured greatcoat"
+	desc = "An oversized matte black trenchcoat with red on the bottom, it makes you feel just like the good old days after 9/11."
+	icon_state = "sundowner_coat_lowfade"
+	item_state = "sundowner_coat_lowfade"
+	armor = list(melee = 70, bullet = 45, laser = 0, energy = 0, bomb = 50, bio = 0, rad = 0)

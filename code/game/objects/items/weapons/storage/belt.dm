@@ -381,3 +381,17 @@
 		"/obj/item/weapon/mop",
 		"/obj/item/weapon/storage/bag/trash")
 
+/obj/item/weapon/storage/belt/sundowner
+	name = "machete holster"
+	desc = "A custom-made high-frequency machete holster."
+	icon_state = "bladeholster"
+	item_state = "bladeholster"
+	storage_slots = 2
+	can_only_hold = list(
+		"/obj/item/weapon/melee/energy/hfmachete"
+		)
+
+/obj/item/weapon/storage/belt/sundowner/New()
+	..()
+	new /obj/item/weapon/melee/energy/hfmachete(src)
+	new /obj/item/weapon/melee/energy/hfmachete(src)

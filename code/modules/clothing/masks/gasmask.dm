@@ -277,3 +277,76 @@
 	species_fit = list(VOX_SHAPED)
 	can_flip = 0
 	canstage = 0
+
+/obj/item/clothing/mask/gas/sundowner
+	name = "\improper 978-AZQEE face plate"
+	desc = "A heavy-duty combat mask made by Desperado Space Enforcement LLC. It projects a holo serial number \"978-AZQEE\" over the forehead of its wearer."
+	icon_state = "sundowner_mask"
+	item_state = "sundowner_mask"
+	is_flipped = 2 //Starts open, badass.
+	body_parts_covered = EARS
+	species_restricted = list("exclude",VOX_SHAPED, GREY_SHAPED)
+	canstage = FALSE
+	canremove = FALSE //Once you go black you never go back.
+	gas_transfer_coefficient = null
+	permeability_coefficient = null
+	var/list/color_matrix = null
+	actions_types = list(/datum/action/item_action/playtimes_over)
+
+/datum/action/item_action/playtimes_over
+	name = "Playtime's over, Jack."
+
+/datum/action/item_action/playtimes_over/Trigger()
+	var/obj/item/clothing/mask/gas/sundowner/T = target
+	if(!istype(T))
+		return
+	T.playtimes_over()
+
+/obj/item/clothing/mask/gas/sundowner/proc/apply_color(mob/living/user)	//shamelessy copypasted from glasses. Should i just move it to clothing level?
+	if(color_matrix)
+		if(user.client)
+			var/client/C = user.client
+			C.color = color_matrix
+
+/obj/item/clothing/mask/gas/sundowner/proc/playtimes_over()
+	var/mob/living/user = usr.is_wearing_item(src, slot_wear_mask)
+
+	if(!user)
+		return
+
+	switch(is_flipped)
+		if(3)
+			icon_state = initial(icon_state)
+			gas_transfer_coefficient = initial(gas_transfer_coefficient)
+			permeability_coefficient = initial(permeability_coefficient)
+			body_parts_covered = initial(body_parts_covered)
+			armor = initial(armor)
+			clothing_flags = initial(clothing_flags)
+			eyeprot = initial(eyeprot)
+			color_matrix = initial(color_matrix)
+			apply_color(user)
+			is_flipped = 2
+		if(2)
+			icon_state = "[initial(icon_state)]_1"
+			gas_transfer_coefficient = 0.01
+			permeability_coefficient = 0.01
+			armor = list(melee = 2, bullet = 2, laser = 2,energy = 2, bomb = 2, bio = 0, rad = 0)
+			clothing_flags = BLOCK_GAS_SMOKE_EFFECT | MASKINTERNALS
+			body_parts_covered |= MOUTH|BEARD
+			is_flipped = 1
+		if(1)
+			icon_state = "[initial(icon_state)]_2"
+			armor = list(melee = 5, bullet = 5, laser = 5,energy = 5, bomb = 5, bio = 0, rad = 0)
+			color_matrix = list(0.33,0.33,0.33,0,
+								0.33,0.33,0.33,0,
+						 		0.33,0.33,0.33,0,
+						 		0,0,0,1,
+						 		0,-0.2,-0.2,0)
+			apply_color(user)
+			body_parts_covered |= FACE
+			eyeprot = 1
+			is_flipped = 3
+	usr.update_inv_wear_mask()
+
+/obj/item/clothing/mask/gas/sundowner/dropped()
+	qdel(src)
