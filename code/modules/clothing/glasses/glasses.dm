@@ -325,3 +325,16 @@
 	icon_state = "kaminaglasses"
 	item_state = "kaminaglasses"
 	cover_hair = 1
+
+/obj/item/clothing/glasses/sundowner
+	name = "sundowner face plate"
+	desc = "A heavy-duty visor made by Desperado Space Enforcement LLC. It comes with a built in Weakness HUD."
+	icon_state = "sundowner_plate"
+	item_state = "sundowner_plate"
+	cover_hair = TRUE
+	eyeprot = 3 //It's a fucking metal plate
+	prescription = TRUE //The wonders of science
+	canremove = FALSE
+
+/obj/item/clothing/glasses/sundowner/dropped()
+	qdel(src)

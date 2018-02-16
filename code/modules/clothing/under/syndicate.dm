@@ -45,12 +45,14 @@
 	species_fit = list(GREY_SHAPED)
 
 /obj/item/clothing/under/syndicate/sundowner
-	name = "\improper 978-AZQEE cybernetic suit"
+	name = "sundowner cybernetic suit"
 	desc = "A heavy-duty cybernetic suit made by Desperado Space Enforcement LLC. Doesn't actually make you fucking invincible."
 	icon_state = "sundowner_suit"
 	item_state = "sundowner_suit"
+	_color = "sundowner_suit"
 	gas_transfer_coefficient = 0.01
 	permeability_coefficient = 0.01
+	body_parts_covered = FULL_TORSO|ARMS|HANDS|LEGS
 	heat_conductivity = INS_JUMPSUIT_HEAT_CONDUCTIVITY
 	species_restricted = list("exclude",VOX_SHAPED)
 	clothing_flags = ONESIZEFITSALL
@@ -60,7 +62,7 @@
 /obj/item/clothing/under/syndicate/sundowner/equipped(mob/living/carbon/human/C, wear_suit)
 	if(C.is_wearing_item(src, wear_suit))
 		to_chat(usr, "<span class='warning'>A spike of pain jolts your body as \the [name] merges with your skin and flesh.</span>")
-		C.drop_item(C.get_item_by_slot(slot_wear_mask), force_drop = 1)
+		C.drop_item(C.get_item_by_slot(slot_wear_mask), force_drop = TRUE)
 		C.equip_to_slot_or_del(new /obj/item/clothing/mask/gas/sundowner(src), slot_wear_mask)
-		C.drop_item(C.get_item_by_slot(slot_shoes), force_drop = 1)
+		C.drop_item(C.get_item_by_slot(slot_shoes), force_drop = TRUE)
 		C.equip_to_slot_or_del(new /obj/item/clothing/shoes/magboots/captain/sundowner(src), slot_shoes)

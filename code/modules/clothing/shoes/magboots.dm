@@ -139,10 +139,13 @@
 		to_chat(usr, "Small spikes shoot from your shoes and dig into the flooring, bracing you.")
 
 /obj/item/clothing/shoes/magboots/captain/sundowner
-	name = "\improper 978-AZQEE greaves"
+	name = "sundowner greaves"
 	desc = "Heavy-duty greaves made by Desperado Space Enforcement LLC. These have retractable spikes in the soles to maintain grip."
 	icon_state = "sundowner_boots0"
 	base_state = "sundowner_boots"
+	gas_transfer_coefficient = 0.01
+	permeability_coefficient = 0.01
+	heat_conductivity = INS_JUMPSUIT_HEAT_CONDUCTIVITY
 	mag_slow = MAGBOOTS_SLOWDOWN_LOW
 	canremove = FALSE //Once you go black you never go back.
 	armor = list(melee = 10, bullet = 5, laser = 0, energy = 0, bomb = 15, bio = 0, rad = 0)
