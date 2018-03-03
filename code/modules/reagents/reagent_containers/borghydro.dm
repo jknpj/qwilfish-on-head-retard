@@ -126,3 +126,17 @@
 	reagent_ids = list(CYANIDE)
 	volume = 10
 	recharge_time = 10
+
+/obj/item/weapon/reagent_containers/borghypo/xeno
+	name = "tail hypospray"
+	desc = "The XX121's hypotail has roughly the length of the rest of its body, with a small, almost surgical stinger-like barb on the end."
+	icon = 'icons/obj/borg_items.dmi'
+	icon_state = "xeno-hypo"
+	reagent_ids = list(SEROTROTIUM, NEUROTOXIN)
+	volume = 5
+	recharge_time = 20
+
+/obj/item/weapon/reagent_containers/borghypo/xeno/hacked
+	reagent_ids = list(NEUROTOXIN) //the real deal
+	volume = 10
+	recharge_time = 10

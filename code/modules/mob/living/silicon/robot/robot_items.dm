@@ -609,3 +609,113 @@
 		I.interact(usr)
 		return
 	return ..()
+
+//Xenoborg's CARESSING module.
+//Unlike the hugging module this one is a weapon.
+
+#define CARESS 0
+#define DISARM 1
+#define KNOCK 2
+#define SLASH 3
+
+/obj/item/weapon/xenohug
+	name = "caressing module"
+	icon = 'icons/obj/borg_items.dmi'
+	icon_state = "xeno-default"
+	desc = "Works just like the real thing!"
+	var/mode = CARESS
+	var/cooldown = 0 //Unlike the hugging module all modes share this cooldown.
+
+/obj/item/weapon/xenohug/attack_self(mob/living/user)
+	var/mob/living/silicon/robot/P = user
+	if(mode < P.emagged? SLASH : DISARM)
+		mode++
+	else
+		mode = initial(mode)
+	switch(mode)
+		if(CARESS)
+			name = initial(name)
+			icon_state = initial(icon_state)
+			force = initial(force)
+			sharpness_flags = initial(sharpness_flags)
+			to_chat(user,"<span class='warning' style=\"font-family:Courier\">SYSTEM ALERT: All safeties enabled.</span>")
+		if(DISARM)
+			to_chat(user,"<span class='warning' style=\"font-family:Courier\">SYSTEM ALERT: Disarm safety disabled.</span>")
+		if(KNOCK)
+			to_chat(user,"<span class='warning' style=\"font-family:Courier\">SYSTEM ALERT: Tackling safety disabled.</span>")
+		if(SLASH)
+			name = "holo claws"
+			icon_state = "[initial(icon_state)]-claws"
+			force = 30
+			sharpness_flags = SHARP_TIP | SHARP_BLADE | HOT_EDGE | CHOPWOOD
+			to_chat(user,"<span class='warning' style=\"font-family:Courier\">SYSTEM ALERT: All safeties disabled.</span>")
+			to_chat(user,"<span class='danger' style=\"font-family:Courier\">DEPLOYING HOLO CLAWS.</span>")
+
+/obj/item/weapon/xenohug/attack(mob/living/M, mob/living/silicon/robot/user)
+	switch(mode)
+		if(CARESS)
+			if(ishuman(M))
+				if(user.zone_sel.selecting == "head")
+					user.visible_message("<span class='notice'>[user] pats [M]'s head!</span>", \
+						"<span class='notice'>You pat [M]'s head!</span>")
+					playsound(loc, 'sound/weapons/tap.ogg', 25, 1, -1)
+				else
+					if(M.lying)
+						user.visible_message("<span class='notice'>[user] shakes [M] trying to get them up!</span>", \
+							"<span class='notice'>You shake [M] trying to get them up!</span>")
+						M.resting = FALSE
+						M.update_canmove()
+					else
+						user.visible_message("<span class='notice'>[user] caresses [M] with its [name].</span>", \
+								"<span class='notice'>You caress [M] with your [name].</span>")
+						M.reagents.add_reagent(PARACETAMOL, 1)
+			else
+				if(M == user)
+					return //Don't be dumb.
+				user.visible_message("<span class='notice'>[user] caresses [M] with its [name].</span>", \
+						"<span class='notice'>You caress [M] with your [name].</span>")
+		if(DISARM)
+			if(!cooldown)
+				M.disarm_mob(user)
+				user.cell.charge -= 200
+				cooldown = TRUE
+				spawn(2 SECONDS)
+				cooldown = FALSE
+		if(KNOCK) //The authentic xenomorph experience.
+			if(!cooldown)
+				if(prob(80))
+					do_attack_animation(M, src)
+					playsound(loc, 'sound/weapons/pierce.ogg', 25, 1, -1)
+					M.Knockdown(rand(3,4))
+
+					user.visible_message("<span class='danger'>[user] has tackled down [M]!</span>", \
+						"<span class='danger'>You tackle down [M]!</span>")
+					add_logs(user, M, "tackled down with \the [src]", admin = (user.ckey && M.ckey))
+				else
+					playsound(loc, 'sound/weapons/slashmiss.ogg', 25, 1, -1)
+					user.visible_message("<span class='danger'>[user] has tried to tackle [M]!</span>", \
+						"<span class='danger'>You try to tackle [M]!</span>")
+				user.cell.charge -= 400
+				cooldown = TRUE
+				spawn(2 SECONDS)
+				cooldown = FALSE
+		if(SLASH)
+			if(!cooldown)
+				playsound(loc, 'sound/weapons/pierce.ogg', 25, 1, -1)
+				add_logs(user, M, "slashed with \the [src]", admin = (user.ckey && M.ckey))
+				user.cell.charge -= 300
+				..()
+			cooldown = TRUE
+			spawn(2 SECONDS)
+			cooldown = FALSE
+
+#undef CARESS
+#undef DISARM
+#undef KNOCK
+#undef SLASH
+
+/obj/item/device/flash/xenoflash
+	name = "eye flash"
+	desc = "Useful for taking pictures, making friends and flash-frying chips."
+	icon = 'icons/obj/borg_items.dmi'
+	icon_state = "xeno-flash"

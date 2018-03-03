@@ -585,8 +585,8 @@
 			apply_material_decorations = FALSE
 			apply_image_decorations = FALSE
 			var/list/possible_spawns=list()
-			possible_spawns += /obj/item/device/mmi/posibrain/strangeball
-			possible_spawns += /obj/item/device/mmi/posibrain/strangeball/strangeegg
+			possible_spawns += /obj/item/device/mmi/posibrain/strange/ball
+			possible_spawns += /obj/item/device/mmi/posibrain/strange/egg
 			var/new_type = pick(possible_spawns)
 			new_item = new new_type(src.loc)
 		if(ARCHAEO_SASH)

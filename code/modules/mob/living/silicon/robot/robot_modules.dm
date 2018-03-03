@@ -12,6 +12,7 @@
 	var/list/sprites = list()
 
 	//Modules
+	var/default_modules = TRUE //Flash/Light
 	var/list/modules = list()
 	var/list/upgrades = list()
 	var/obj/item/emag = null
@@ -77,21 +78,21 @@
 		emag.emp_act(severity)
 	..()
 
-/obj/item/weapon/robot_module/New(var/mob/living/silicon/robot/R, var/default = TRUE)
+/obj/item/weapon/robot_module/New(var/mob/living/silicon/robot/R)
 	..()
 	added_languages = list()
 	add_languages(R)
 	AddToProfiler()
-	if(default)
-		AddDefaultModules()
+	AddDefaultModules()
 	UpdateModuleHolder(R)
 	AddCameraNetworks(R)
 	AddEncryptionKey(R)
 	ApplyStatusFlags(R)
 
 /obj/item/weapon/robot_module/proc/AddDefaultModules()
-	modules += new /obj/item/device/flashlight(src)
-	modules += new /obj/item/device/flash(src)
+	if(default_modules)
+		modules += new /obj/item/device/flashlight(src)
+		modules += new /obj/item/device/flash(src)
 
 /obj/item/weapon/robot_module/proc/UpdateModuleHolder(var/mob/living/silicon/robot/R, var/reset = FALSE)
 	if(R.hands) //To prevent runtimes when spawning borgs with forced module and no client.
@@ -583,5 +584,23 @@
 	emag = new /obj/item/weapon/reagent_containers/borghypo/peace/hacked(src)
 
 	sensor_augs = list("Medical", "Disable")
+
+	fix_modules()
+
+/obj/item/weapon/robot_module/xx121
+	name = "xx121 robot module"
+	default_modules = FALSE
+	sprites = list("Xenomorph" = "xenoborg")
+	languages = list(LANGUAGE_XENO = TRUE)
+
+/obj/item/weapon/robot_module/xx121/New()
+	..()
+
+	modules += new /obj/item/device/flash/xenoflash(src)
+	modules += new /obj/item/weapon/cookiesynth/xeno(src)
+	modules += new /obj/item/weapon/reagent_containers/borghypo/xeno(src)
+	modules += new /obj/item/weapon/xenohug(src)
+	emag = new /obj/item/weapon/reagent_containers/borghypo/xeno/hacked(src)
+	sensor_augs = list("Light Amplification", "Disable")
 
 	fix_modules()
