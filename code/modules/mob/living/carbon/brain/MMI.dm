@@ -5,6 +5,7 @@
 	desc = "The Warrior's bland acronym, MMI, obscures the true horror of this monstrosity."
 	icon = 'icons/obj/assemblies.dmi'
 	icon_state = "mmi_empty"
+	var/dead_icon = "mmi_dead"
 	w_class = W_CLASS_MEDIUM
 	origin_tech = Tc_BIOTECH + "=3"
 
@@ -62,29 +63,24 @@ obj/item/device/mmi/Destroy()
 		if(jobban_isbanned(brainmob, "Mobile MMI"))
 			to_chat(user, "<span class='warning'>This brain does not seem to fit.</span>")
 			return TRUE
-		//canmove = 0
-		icon = null
-		invisibility = 101
+
 		var/mob/living/silicon/robot/mommi/M = new /mob/living/silicon/robot/mommi/nt(get_turf(loc))
+
 		if(!M)
 			return
-		M.invisibility = 0
-		//M.custom_name = created_name
 
 		brainmob.mind.transfer_to(M)
-		M.Namepick()
-		M.updatename()
+		src.forceMove(M)
+		M.mmi = src
+
+		spawn()
+			M.Namepick()
 
 		if(M.mind && M.mind.special_role)
 			M.mind.store_memory("In case you look at this after being borged, the objectives are only here until I find a way to make them not show up for you, as I can't simply delete them without screwing up round-end reporting. --NeoFite")
 
-		M.job = "MoMMI"
-
-		M.cell = locate(/obj/item/weapon/cell) in contents
-		M.cell.forceMove(M)
-		src.forceMove(M)//Should fix cybros run time erroring when blown up. It got deleted before, along with the frame.
-		M.mmi = src
 		return TRUE
+
 	for(var/t in mommi_assembly_parts)
 		if(istype(O,t))
 			var/cc=contents_count(t)
@@ -150,11 +146,26 @@ obj/item/device/mmi/Destroy()
 		name = "[initial(name)]: [brainmob.real_name]"
 		icon_state = "mmi_full"
 
-		locked = 1
+		locked = TRUE
 
 		feedback_inc("cyborg_mmis_filled",1)
 
 		return TRUE
+
+	if(istype(O, /obj/item/weapon/holder/diona) && !brainmob)
+		var/obj/item/weapon/holder/diona/DH = O
+		if(DH.stored_mob) //you never know, might as well check.
+			var/mob/living/carbon/monkey/diona/V = DH.stored_mob
+			if(!V.mind || !V.key)
+				to_chat(user, "<span class='warning'>It would appear [V] is void of consciousness, defeats MMI's purpose.</span>")
+				return TRUE
+			if(!user.drop_item(DH)) //again, you never know.
+				to_chat(user, "<span class='warning'>You can't let go of \the [DH]!</span>")
+				return TRUE
+			transfer_nymph(V)
+			visible_message("<span class='notice'>[user] sticks [V] into \the [src].</span>")
+			feedback_inc("cyborg_mmis_filled",1)
+			return TRUE
 
 	if((istype(O,/obj/item/weapon/card/id)||istype(O,/obj/item/device/pda)) && brainmob)
 		if(allowed(user))
@@ -176,6 +187,16 @@ obj/item/device/mmi/Destroy()
 	else if(locked)
 		to_chat(user, "<span class='warning'>You upend \the [src], but the brain is clamped into place.")
 	else
+		for(var/mob/living/carbon/monkey/diona/V in brainmob.contents)
+			to_chat(user, "<span class='notice'>You uppend the MMI, dropping [brainmob.real_name] onto the floor.</span>")
+			V.loc = user.loc
+			qdel(brainmob)
+			brainmob = null
+
+			icon_state = "mmi_empty"
+			name = initial(name)
+			
+			return
 		to_chat(user, "<span class='notice'>You upend \the [src], spilling the brain onto the floor.</span>")
 		var/obj/item/organ/internal/brain/brain = new(user.loc)
 		brain.transfer_identity(brainmob)
@@ -193,10 +214,22 @@ obj/item/device/mmi/Destroy()
 		brainmob.dna = H.dna.Clone()
 	brainmob.container = src
 
-	name = "Man-Machine Interface: [brainmob.real_name]"
+	name = "[initial(name)]: [brainmob.real_name]"
 	icon_state = "mmi_full"
-	locked = 1
-	return
+	locked = TRUE
+
+/obj/item/device/mmi/proc/transfer_nymph(mob/living/carbon/monkey/diona/H)
+	brainmob = new(src)
+	if(H.mind)
+		H.mind.transfer_to(brainmob)
+		brainmob.stat = CONSCIOUS
+	H.drop_all() //Drop everything they have.
+	H.forceMove(brainmob)
+
+	name = "[initial(name)]: [brainmob.real_name]"
+	icon_state = "mmi_fullnymph"
+	dead_icon = icon_state //placeholder
+	locked = TRUE
 
 /obj/item/device/mmi/radio_enabled
 	name = "Radio-enabled Man-Machine Interface"
@@ -222,11 +255,11 @@ obj/item/device/mmi/Destroy()
 	set src = usr.loc//In user location, or in MMI in this case.
 	set popup_menu = 0//Will not appear when right clicking.
 
-	if(brainmob.stat)//Only the brainmob will trigger these so no further check is necessary.
+	if(brainmob.incapacitated())//Only the brainmob will trigger these so no further check is necessary.
 		to_chat(brainmob, "Can't do that while incapacitated or dead.")
 
-	radio.broadcasting = radio.broadcasting==1 ? 0 : 1
-	to_chat(brainmob, "<<span class='notice'>Radio is [radio.broadcasting==1 ? "now" : "no longer"] broadcasting.</span>")
+	radio.broadcasting = radio.broadcasting ? FALSE : TRUE
+	to_chat(brainmob, "<<span class='notice'>Radio is [radio.broadcasting? "now" : "no longer"] broadcasting.</span>")
 
 /obj/item/device/mmi/radio_enabled/verb/Toggle_Listening()
 	set name = "Toggle Listening"
@@ -238,7 +271,7 @@ obj/item/device/mmi/Destroy()
 	if(brainmob.stat)
 		to_chat(brainmob, "Can't do that while incapacitated or dead.")
 
-	radio.listening = radio.listening==1 ? 0 : 1
+	radio.listening = radio.listening? FALSE : TRUE
 	to_chat(brainmob, "<span class='notice'>Radio is [radio] receiving broadcast.</span>")
 
 /obj/item/device/mmi/emp_act(severity)
@@ -269,7 +302,7 @@ obj/item/device/mmi/Destroy()
 	if(locked!=2)
 		if(src.brainmob)
 			if(src.brainmob.stat == DEAD)
-				to_chat(user, "<span class='deadsay'>It appears the brain has suffered irreversible tissue degeneration</span>")//suicided
+				to_chat(user, "<span class='deadsay'>It appears [brainmob.real_name] has suffered irreversible tissue degeneration</span>")//suicided
 
 			else if(!src.brainmob.client)
 				to_chat(user, "<span class='notice'>It appears to be lost in its own thoughts</span>")//closed game window
@@ -282,5 +315,5 @@ obj/item/device/mmi/Destroy()
 
 /obj/item/device/mmi/OnMobDeath(var/mob/living/carbon/brain/B)
 	if(istype(B))
-		icon_state = "mmi_dead"
+		icon_state = dead_icon
 		visible_message(message = "<span class='danger'>[B]'s MMI flatlines!</span>", blind_message = "<span class='warning'>You hear something flatline.</span>")
