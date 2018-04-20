@@ -41,6 +41,39 @@
 
 	var/icon_aggro = "bigroach_angry"
 
+/mob/living/simple_animal/hostile/bigroach/queen/golden
+	name = "golden cockroach matriarch"
+	icon_state = "gtb"
+	icon_living = "gtb"
+	icon_dead = "gtb_dead"
+	icon_aggro = "gtb_angry"
+	maxHealth = 300
+	health = 300
+	environment_smash_flags = SMASH_LIGHT_STRUCTURES | SMASH_CONTAINERS
+	icon = 'icons/mob/giantmobs.dmi'
+	pixel_x = -16 * PIXEL_MULTIPLIER
+	var/spell/mirror_of_pain/PM = null
+
+/mob/living/simple_animal/hostile/bigroach/queen/golden/New()
+	..()
+	desc += " Its shell is covered in pure gold."
+
+/mob/living/simple_animal/hostile/bigroach/queen/golden/adjustBruteLoss()
+	if(prob(50))
+		if(!PM)
+			PM = new /spell/mirror_of_pain
+		PM.perform(src, 1, src) //Physical-damage reflective coating
+	..()
+
+/mob/living/simple_animal/hostile/bigroach/queen/golden/bullet_act(var/obj/item/projectile/P)
+	if(prob(10))
+		visible_message("<span class='danger'>\The [P.name] gets reflected by \the [name]'s shell!</span>")
+		P.reflected = TRUE
+		P.rebound(src)
+	else
+		visible_message("\The [P.name] bounces harmlessly off of [src]</span>")
+	return -1 //Projectile-proof golden armor
+
 /mob/living/simple_animal/hostile/bigroach/queen
 	name = "cockroach matriarch"
 	desc = "A cockroach, twisted and deformed by mutagenic chemicals nearly to the point of unrecognition, reaching nearly the size of an adult human. By an odd twist of fate, is not only alive and functioning - it is also able to lay eggs."
