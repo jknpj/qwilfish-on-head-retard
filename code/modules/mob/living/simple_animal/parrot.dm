@@ -41,6 +41,8 @@
 	emote_hear = list("squawks","bawks")
 	emote_see = list("flutters its wings")
 
+	speak_override = FALSE
+
 	speak_chance = 1 //1% (1 in 100) chance every tick; So about once per 150 seconds, assuming an average tick is 1.5s
 	turns_per_move = 5
 	meat_type = /obj/item/weapon/reagent_containers/food/snacks/cracker/
@@ -149,12 +151,12 @@
 			times_examined_while_dead = 0
 	..()
 
-/mob/living/simple_animal/parrot/Die()
+/mob/living/simple_animal/parrot/death(var/gibbed = FALSE)
 	if(held_item)
 		held_item.forceMove(src.loc)
 		held_item = null
 	walk(src,0)
-	..()
+	..(gibbed)
 
 /mob/living/simple_animal/parrot/Stat()
 	..()

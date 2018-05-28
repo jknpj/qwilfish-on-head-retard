@@ -459,7 +459,9 @@
 	else if(href_list["delay_round_end"])
 		if(!check_rights(R_SERVER))
 			return
-
+		var/response = alert("Toggle round end delay? It is currently [ticker.delay_end?"delayed":"not delayed"]","Toggle round end delay","Yes","No")
+		if(response != "Yes")
+			return
 		ticker.delay_end = !ticker.delay_end
 		log_admin("[key_name(usr)] [ticker.delay_end ? "delayed the round end" : "has made the round end normally"].")
 		message_admins("<span class='notice'>[key_name(usr)] [ticker.delay_end ? "delayed the round end" : "has made the round end normally"].</span>", 1)
@@ -2338,7 +2340,7 @@
 			to_chat(H, "<span class='warning'>Your ass was just blown off by an unknown force!</span>")
 			log_admin("[key_name(H)] was buttblasted by [src.owner]")
 			message_admins("[key_name(H)] was buttblasted by [src.owner]")
-			playsound(get_turf(H), 'sound/effects/superfart.ogg', 50, 1)
+			playsound(H, 'sound/effects/superfart.ogg', 50, 1)
 			H.apply_damage(40, BRUTE, LIMB_GROIN)
 			H.apply_damage(10, BURN, LIMB_GROIN)
 			H.Knockdown(8)
@@ -2532,7 +2534,7 @@
 				base_law_type = selected_law
 				subject = "AIs and Cyborgs"
 			if("mommi")
-				mommi_base_law_type = selected_law
+				mommi_laws["Default"] = selected_law
 				subject = "MoMMIs"
 		to_chat(usr, "<span class='notice'>New [subject] will spawn with the [selected_law] lawset.</span>")
 		log_admin("[key_name(src.owner)] set the default laws of [subject] to: [selected_law]")
@@ -3321,8 +3323,12 @@
 				feedback_add_details("admin_secrets_fun_used","HW")
 				var/choice = input("Are you sure you want to wake up the space indian burial ground?. Misuse of this could result in removal of flags or hilarity.") in list("Get our spook on", "Cancel")
 				if(choice != "Cancel")
-					SetUniversalState(/datum/universal_state/halloween, 1, 1)
-					message_admins("[key_name_admin(usr)] has pressed the halloween fun button. Truly [key_name_admin(usr)] is the spookiest.")
+					var/list/given_args = list()
+					var/number = input("How many mobs do you want per area?", 10) as num
+					if(number)
+						given_args["mobs"] = number
+					SetUniversalState(/datum/universal_state/halloween, 1, 1, given_args)
+					message_admins("[key_name_admin(usr)] has pressed the halloween fun button with [number] amount of mobs per area. Truly [key_name_admin(usr)] is the spookiest.")
 			if("christmas_vic")
 				feedback_inc("admin_secrets_fun_used",1)
 				feedback_add_details("admin_secrets_fun_used","XMS")
@@ -3564,6 +3570,7 @@
 					"incinerator" = LOC_INCIN,
 					"chapel" = LOC_CHAPEL,
 					"library" = LOC_LIBRARY,
+					"hydroponics" = LOC_HYDRO,
 					"vault" = LOC_VAULT,
 					"technical storage" = LOC_TECH,
 					)
@@ -4792,7 +4799,7 @@
 					 (<A HREF='?_src_=holder;subtlemessage=\ref[R.religiousLeader.current]'>SM</A>)<br/>"
 			text += "<b>Adepts:</b> <ul>"
 			for (var/datum/mind/M in R.adepts)
-				text += "<li>[M.name] (<A HREF='?_src_=vars;Vars=\ref[M.current]'>VV</A>) (<A HREF='?_src_=holder;adminplayerobservejump=\ref[M.current]&;religions=renounce&mob=\ref[M.current]'>JMP</A>) \
+				text += "<li>[M.name] (<A HREF='?_src_=vars;Vars=\ref[M.current]'>VV</A>) (<A HREF='?_src_=holder;adminplayerobservejump=\ref[M.current]&mob=\ref[M.current]'>JMP</A>) \
 					 	  (<A HREF='?_src_=holder;subtlemessage=\ref[M.current]'>SM</A>) (<A HREF='?_src_=holder;religions=renounce&mob=\ref[M.current]'>Deconvert</A>)</li>"
 			text +="</ul>"
 			text += "<A HREF='?src=\ref[src];religions=global_subtle_pm&rel=\ref[R]'>Subtle PM all believers</a> <br/>"

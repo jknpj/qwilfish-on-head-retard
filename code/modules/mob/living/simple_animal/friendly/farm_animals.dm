@@ -22,6 +22,7 @@
 	melee_damage_upper = 2
 	size = SIZE_BIG
 	environment_smash_flags = SMASH_LIGHT_STRUCTURES
+	speak_override = TRUE
 
 	var/datum/reagents/udder = null
 
@@ -106,6 +107,7 @@
 	response_harm   = "kicks"
 	attacktext = "kicks"
 	health = 50
+	speak_override = TRUE
 
 	size = SIZE_BIG
 	holder_type = /obj/item/weapon/holder/animal/cow
@@ -176,6 +178,7 @@
 	var/amount_grown = 0
 	pass_flags = PASSTABLE | PASSGRILLE
 	size = SIZE_TINY
+	speak_override = TRUE
 
 /mob/living/simple_animal/chick/New()
 	..()
@@ -191,8 +194,7 @@
 	if(!stat && !ckey)
 		amount_grown += rand(1,2)
 		if(amount_grown >= 100)
-			new /mob/living/simple_animal/chicken(src.loc)
-			qdel(src)
+			grow_up()
 
 /mob/living/simple_animal/chicken
 	name = "chicken"
@@ -216,6 +218,7 @@
 	var/body_color
 	pass_flags = PASSTABLE
 	size = SIZE_SMALL
+	speak_override = TRUE
 
 /mob/living/simple_animal/chicken/New()
 	if(prob(5))
@@ -292,6 +295,7 @@
 	max_n2 = 0
 	treadmill_speed = 1.5
 	var/fat = 0
+	speak_override = TRUE
 
 /mob/living/simple_animal/hostile/retaliate/box/New()
 	..()
@@ -342,8 +346,8 @@
 	if(fat>BOX_GROWTH_BAR)
 		updatefat()
 
-/mob/living/simple_animal/hostile/retaliate/box/Die()
-	..()
+/mob/living/simple_animal/hostile/retaliate/box/death(var/gibbed = FALSE)
+	..(gibbed)
 	playsound(src, 'sound/effects/box_scream.ogg', 100, 1)
 
 /mob/living/simple_animal/hostile/retaliate/box/attackby(var/obj/item/O as obj, var/mob/user as mob)

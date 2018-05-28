@@ -13,7 +13,7 @@
 #define PROFILE_MACHINES // Disable when not debugging.
 
 #define ARBITRARILY_LARGE_NUMBER 10000 //Used in delays.dm and vehicle.dm. Upper limit on delays
-#define ARBITRARILY_PLANCK_NUMBER 1.417*(10**32) //1.417×10^32. Because ARBITRARILY_LARGE_NUMBER is too small and INF is too large
+#define ARBITRARILY_PLANCK_NUMBER 1.417*(10**32) //1.417Ã—10^32. Because ARBITRARILY_LARGE_NUMBER is too small and INF is too large
 #define MAX_VALUE 65535
 
 #ifdef PROFILE_MACHINES
@@ -375,6 +375,8 @@ var/global/list/BODY_COVER_VALUE_LIST=list("[HEAD]" = COVER_PROTECTION_HEAD,"[EY
 #define DISABILITY_FLAG_BLIND       16
 #define DISABILITY_FLAG_MUTE		32
 #define DISABILITY_FLAG_VEGAN		64
+#define DISABILITY_FLAG_ASTHMA 128
+#define DISABILITY_FLAG_LACTOSE		256
 
 ///////////////////////////////////////
 // MUTATIONS
@@ -447,6 +449,8 @@ var/global/list/BODY_COVER_VALUE_LIST=list("[HEAD]" = COVER_PROTECTION_HEAD,"[EY
 #define M_FARSIGHT	212		// Increases mob's view range by 2
 #define M_NOIR		213		// aww yis detective noir
 #define M_VEGAN		214
+#define M_ASTHMA	215
+#define M_LACTOSE	216
 
 var/global/list/NOIRMATRIX = list(0.33,0.33,0.33,0,\
 				 				  0.33,0.33,0.33,0,\
@@ -464,6 +468,8 @@ var/global/list/bad_changing_colour_ckeys = list()
 #define COUGHING		4
 #define TOURETTES		8
 #define NERVOUS			16
+#define ASTHMA		32
+#define LACTOSE		64
 
 //sdisabilities
 #define BLIND			1
@@ -920,6 +926,8 @@ var/list/RESTRICTED_CAMERA_NETWORKS = list( //Those networks can only be accesse
 #define PLASMA_IMMUNE 512
 #define RAD_GLOW 1024
 #define ELECTRIC_HEAL 2048
+#define IS_SPECIES_MUTE 4096
+#define REQUIRE_DARK 8192
 
 //Species anatomical flags.
 #define HAS_SKIN_TONE 1
@@ -958,6 +966,7 @@ var/default_colour_matrix = list(1,0,0,0,\
 //Language flags.
 #define WHITELISTED 1  // Language is available if the speaker is whitelisted.
 #define RESTRICTED 2   // Language can only be accquired by spawning or an admin.
+#define CAN_BE_SECONDARY_LANGUAGE 4 // Language is available on character setup as secondary language.
 
 // Hairstyle flags
 #define HAIRSTYLE_CANTRIP 1 // 5% chance of tripping your stupid ass if you're running.
@@ -990,6 +999,8 @@ var/default_colour_matrix = list(1,0,0,0,\
 #define VAMP_SHADOW   15
 #define VAMP_CHARISMA 16
 #define VAMP_UNDYING  17
+
+#define STARTING_BLOOD 10
 
 // Moved from machine_interactions.dm
 #define STATION_Z  1
@@ -1359,7 +1370,7 @@ var/proccalls = 1
 #define FOOD_SWEET	4
 #define FOOD_LIQUID	8
 #define FOOD_SKELETON_FRIENDLY 16 //Can be eaten by skeletons
-
+#define FOOD_LACTOSE 32 //Contains MILK
 /*
  *
  *
@@ -1419,6 +1430,7 @@ var/proccalls = 1
 #define MODE_CHANGELING "changeling"
 #define MODE_CULTCHAT "cultchat"
 #define MODE_ANCIENT "ancientchat"
+#define MODE_MUSHROOM "sporechat"
 
 //Hardcore mode stuff
 
@@ -1571,8 +1583,13 @@ var/proccalls = 1
 #define HUD_MEDICAL 1
 #define HUD_SECURITY 2
 
-#define INERTIA_MOVEDELAY 5
+//Cyborg components
+#define COMPONENT_BROKEN -1
+#define COMPONENT_MISSING 0
+#define COMPONENT_INSTALLED 1
 
+//Glidesize
+#define INERTIA_MOVEDELAY 5
 #define FRACTIONAL_GLIDESIZES 1
 #ifdef FRACTIONAL_GLIDESIZES
 #define DELAY2GLIDESIZE(delay) (WORLD_ICON_SIZE / max(Ceiling(delay / world.tick_lag), 1))

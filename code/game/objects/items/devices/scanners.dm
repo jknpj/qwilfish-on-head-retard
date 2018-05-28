@@ -5,6 +5,7 @@ HEALTH ANALYZER
 GAS ANALYZER
 MASS SPECTROMETER
 REAGENT SCANNER
+BREATHALYZER
 */
 
 /obj/item/device/t_scanner
@@ -300,7 +301,7 @@ Subject's pulse: ??? BPM"})
 
 	var/datum/gas_mixture/environment = location.return_air()
 
-	to_chat(user, output_gas_scan(environment, location, 1))
+	to_chat(user, output_gas_scan(environment, location, 1, CELL_VOLUME))
 
 	src.add_fingerprint(user)
 	return
@@ -323,14 +324,20 @@ Subject's pulse: ??? BPM"})
 		return
 	var/turf/T = A
 	var/datum/gas_mixture/environment = T.return_air()
-	to_chat(user, output_gas_scan(environment, T, 1))
+	to_chat(user, output_gas_scan(environment, T, 1, CELL_VOLUME))
 	add_fingerprint(user)
 
 //If human_standard is enabled, the message will be formatted to show which values are dangerous
-/obj/item/device/analyzer/proc/output_gas_scan(var/datum/gas_mixture/scanned, var/atom/container, human_standard = 1)
+//If unit_vol is specified, it will output the values for that volume of the scanned gas. Really for analyzing areas.
+/obj/item/device/analyzer/proc/output_gas_scan(var/datum/gas_mixture/scanned, var/atom/container, human_standard = 1, unit_vol)
 	if(!scanned)
 		return "<span class='warning'>No gas mixture found.</span>"
 	scanned.update_values()
+	if(unit_vol)
+		var/datum/gas_mixture/unit = new() //Unless something goes horribly wrong, this will be cleaned up by the GC at the end of the proc.
+		unit.volume = unit_vol
+		unit.copy_from(scanned)
+		scanned = unit
 	var/pressure = scanned.return_pressure()
 	var/total_moles = scanned.total_moles()
 	var/message = ""
@@ -349,13 +356,13 @@ Subject's pulse: ??? BPM"})
 		var/unknown_concentration =  1 - (o2_concentration + n2_concentration + co2_concentration + plasma_concentration)
 
 		if(n2_concentration > 0.01)
-			message += "<br>[human_standard && abs(n2_concentration - N2STANDARD) > 20 ? "<span class='bad'>" : "<span class='notice'>"] Nitrogen: [round(scanned.nitrogen / scanned.volume * CELL_VOLUME, 0.1)] mol, [round(n2_concentration*100)]%</span>"
+			message += "<br>[human_standard && abs(n2_concentration - N2STANDARD) > 20 ? "<span class='bad'>" : "<span class='notice'>"] Nitrogen: [round(scanned.nitrogen, 0.1)] mol, [round(n2_concentration*100)]%</span>"
 		if(o2_concentration > 0.01)
-			message += "<br>[human_standard && abs(o2_concentration - O2STANDARD) > 2 ? "<span class='bad'>" : "<span class='notice'>"] Oxygen: [round(scanned.oxygen / scanned.volume * CELL_VOLUME, 0.1)] mol, [round(o2_concentration*100)]%</span>"
+			message += "<br>[human_standard && abs(o2_concentration - O2STANDARD) > 2 ? "<span class='bad'>" : "<span class='notice'>"] Oxygen: [round(scanned.oxygen, 0.1)] mol, [round(o2_concentration*100)]%</span>"
 		if(co2_concentration > 0.01)
-			message += "<br>[human_standard ? "<span class='bad'>" : "<span class='notice'>"] CO2: [round(scanned.carbon_dioxide / scanned.volume * CELL_VOLUME, 0.1)] mol, [round(co2_concentration*100)]%</span>"
+			message += "<br>[human_standard ? "<span class='bad'>" : "<span class='notice'>"] CO2: [round(scanned.carbon_dioxide, 0.1)] mol, [round(co2_concentration*100)]%</span>"
 		if(plasma_concentration > 0.01)
-			message += "<br>[human_standard ? "<span class='bad'>" : "<span class='notice'>"] Plasma: [round(scanned.toxins / scanned.volume * CELL_VOLUME, 0.1)] mol, [round(plasma_concentration*100)]%</span>"
+			message += "<br>[human_standard ? "<span class='bad'>" : "<span class='notice'>"] Plasma: [round(scanned.toxins, 0.1)] mol, [round(plasma_concentration*100)]%</span>"
 		if(unknown_concentration > 0.01)
 			message += "<br><span class='notice'>Unknown: [round(unknown_concentration*100)]%</span>"
 
@@ -405,7 +412,7 @@ Subject's pulse: ??? BPM"})
 			return
 		if(!C.dna)
 			return
-		if(M_NOCLONE in C.mutations)
+		if(M_HUSK in C.mutations)
 			return
 
 		var/datum/reagent/B = C.take_blood(src, src.reagents.maximum_volume)
@@ -413,7 +420,7 @@ Subject's pulse: ??? BPM"})
 			update_icon()
 			user.visible_message("<span class='warning'>[user] takes a blood sample from [C].</span>", \
 			"<span class='notice'>You take a blood sample from [C]</span>")
-			playsound(get_turf(src), 'sound/items/hypospray.ogg', 50, 1) //It uses the same thing as the hypospray, in reverse. SCIENCE!
+			playsound(src, 'sound/items/hypospray.ogg', 50, 1) //It uses the same thing as the hypospray, in reverse. SCIENCE!
 
 /obj/item/device/mass_spectrometer/attack_self(mob/user as mob)
 	. = ..()
@@ -495,3 +502,69 @@ Subject's pulse: ??? BPM"})
 	icon_state = "adv_spectrometer"
 	details = 1
 	origin_tech = Tc_MAGNETS + "=4;" + Tc_BIOTECH + "=2"
+
+/obj/item/device/breathalyzer
+	name = "breathalyzer"
+	icon = 'icons/obj/breathalyzer.dmi'
+	icon_state = "idle"
+	item_state = "analyzer"
+	desc = "A hand-held scanner that is able to determine the amount of ethanol in the breath of the subject."
+	flags = FPRINT
+	siemens_coefficient = 1
+	slot_flags = SLOT_BELT
+	throwforce = 3
+	w_class = W_CLASS_TINY
+	throw_speed = 5
+	starting_materials = list(MAT_IRON = 50)
+	w_type = RECYK_ELECTRONIC
+	melt_temperature = MELTPOINT_PLASTIC
+	origin_tech = Tc_ENGINEERING + "=1;" + Tc_BIOTECH + "=1"
+
+	var/legal_limit
+
+/obj/item/device/breathalyzer/New()
+	var/datum/reagent/ethanol/E = /datum/reagent/ethanol
+	legal_limit = initial(E.slur_start) //inb4 shitcurity arrests people for being over the legal limit
+	..()
+
+/obj/item/device/breathalyzer/attack_self(mob/user)
+	var/I = input("Set the legal limit of ethanol.", "Legal Limit", legal_limit) as null|num
+
+	if(I)
+		legal_limit = max(0, I)
+		to_chat(user, "<span class='notice'>You successfully set the legal limit of the breathalyzer.</span>")
+
+/obj/item/device/breathalyzer/attack(mob/living/M, mob/living/user)
+	if(!user.dexterity_check())
+		to_chat(user, "<span class='warning'>You don't have the dexterity to do this!</span>")
+		return
+
+	if(!ishuman(M))
+		return
+
+	var/mob/living/carbon/human/C = M
+
+	if(C.check_body_part_coverage(MOUTH))
+		to_chat(src, "<span class='notice'><B>Remove their [C.get_body_part_coverage(MOUTH)] before using the breathalyzer.</B></span>")
+		return
+
+	playsound(user, 'sound/items/healthanalyzer.ogg', 50, 1)
+
+	var/alcohol = 0
+
+	for(var/datum/reagent/ethanol/E in C.reagents.reagent_list)
+		alcohol += E.volume
+
+	var/dat = "<span class='notice'>The breathalyzer reports that [C] has [alcohol] units of ethanol in their blood.</span>"
+
+	if(alcohol >= legal_limit)
+		dat += "<br><span class='warning'>This is above the legal limit of [legal_limit]!</span>"
+		flick("DRUNK", src)
+	else
+		flick("SOBER", src)
+
+	to_chat(user, dat)
+
+/obj/item/device/breathalyzer/examine(mob/user)
+	..()
+	to_chat(user, "<span class='notice'>Its legal limit is set to [legal_limit] units.</span>")

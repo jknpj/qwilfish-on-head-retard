@@ -159,7 +159,7 @@
 			(scrub_N2O && environment.trace_gases.len > 0) ||\
 			(scrub_O2 && environment.oxygen > 0) ||\
 			(scrub_N2 && environment.nitrogen > 0))
-			var/transfer_moles = min(1, volume_rate/environment.volume)*environment.total_moles()
+			var/transfer_moles = min(1, volume_rate / environment.volume) * environment.total_moles()
 
 			//Take a gas sample
 			var/datum/gas_mixture/removed = loc.remove_air(transfer_moles)
@@ -317,7 +317,7 @@
 			if(do_after(user, src, 20))
 				if(!src || !WT.isOn())
 					return
-				playsound(get_turf(src), 'sound/items/Welder2.ogg', 50, 1)
+				playsound(src, 'sound/items/Welder2.ogg', 50, 1)
 				if(!welded)
 					user.visible_message("[user] welds the scrubber shut.", "You weld the vent scrubber.", "You hear welding.")
 					investigation_log(I_ATMOS, "has been welded shut by [user.real_name] ([formatPlayerPanel(user, user.ckey)]) at [formatJumpTo(get_turf(src))]")

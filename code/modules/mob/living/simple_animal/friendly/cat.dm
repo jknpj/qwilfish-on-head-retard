@@ -16,6 +16,9 @@
 	turns_per_move = 5
 	see_in_dark = 6
 
+	speak_override = TRUE
+
+
 	can_breed = 1
 	species_type = /mob/living/simple_animal/cat
 	childtype = /mob/living/simple_animal/cat/kitten
@@ -71,9 +74,9 @@
 	if((src.loc) && isturf(src.loc))
 		if(!stat && !resting && !locked_to)
 			for(var/mob/living/simple_animal/mouse/M in view(1,src))
-				if(!M.stat)
+				if(!M.stat && Adjacent(M))
 					M.splat()
-					emote("<span class='warning'>[pick(kill_verbs)] \the [M]!</span>")
+					visible_message("<span class='warning'>\The [name] [pick(kill_verbs)] \the [M]!</span>")
 					movement_target = null
 					stop_automated_movement = 0
 					break
@@ -81,8 +84,8 @@
 	..()
 
 	for(var/mob/living/simple_animal/mouse/snack in oview(src, 3))
-		if(prob(15))
-			emote(pick("[pick(growl_verbs)] at [snack]!", "eyes [snack] hungrily."))
+		if(prob(15) && !snack.stat)
+			emote("me",, pick("[pick(growl_verbs)] at [snack]!", "eyes [snack] hungrily."))
 		break
 
 	if(!stat && !resting && !locked_to)
@@ -126,6 +129,7 @@
 
 /mob/living/simple_animal/cat/snek/corpus
 	name = "Corpus"
+	density = 0
 
 var/list/wizard_snakes = list()
 
@@ -138,10 +142,11 @@ var/list/wizard_snakes = list()
 	if(spell_holder)
 		wizard_snakes[src] = spell_holder
 
-/mob/living/simple_animal/cat/snek/wizard/Die()
+/mob/living/simple_animal/cat/snek/wizard/death(var/gibbed = FALSE)
 	if(!transmogrify())
 		visible_message("<span class='notice'>\The [src] vanishes!</span>")
 		qdel(src)
+	..(TRUE)
 
 /mob/living/simple_animal/cat/snek/wizard/Destroy()
 	wizard_snakes[src] = null

@@ -348,7 +348,7 @@
 		mob.set_glide_size(DELAY2GLIDESIZE(move_delay)) //Since we're moving OUT OF OUR OWN VOLITION AND BY OURSELVES we can update our glide_size here!
 
 		// Something with pulling things
-		var/obj/item/weapon/grab/Findgrab = locate() in src
+		var/obj/item/weapon/grab/Findgrab = locate() in mob
 		if(Findgrab)
 			var/list/L = mob.ret_grab()
 			if(istype(L, /list))
@@ -358,7 +358,7 @@
 					if(M)
 						if ((mob.Adjacent(M) || M.loc == mob.loc))
 							var/turf/T = mob.loc
-							step(mob, dir)
+							step(mob, Dir)
 							if (isturf(M.loc))
 								var/diag = get_dir(mob, M)
 								if (!((diag - 1) & diag))
@@ -453,7 +453,7 @@
 			var/movedelay = ETHEREAL_MOVEDELAY
 			mob.set_glide_size(DELAY2GLIDESIZE(movedelay))
 			var/turf/newLoc = get_step(mob,direct)
-			if(!(newLoc.turf_flags & NOJAUNT))
+			if(!(newLoc.turf_flags & NOJAUNT) && !newLoc.holy)
 				mob.forceEnter(newLoc)
 				mob.dir = direct
 			else

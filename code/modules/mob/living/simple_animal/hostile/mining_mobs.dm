@@ -17,6 +17,7 @@
 	response_disarm = "shoves"
 	response_harm = "strikes"
 	status_flags = 0
+	size = SIZE_BIG
 	a_intent = I_HURT
 	var/throw_message = "bounces off of"
 	var/icon_aggro = null // for swapping to when we get aggressive
@@ -219,10 +220,10 @@ obj/item/asteroid/basilisk_hide/New()
 	visible_message("<span class='danger'>The [P.name] was repelled by [src.name]'s girth!</span>")
 	return
 
-/mob/living/simple_animal/hostile/asteroid/goldgrub/Die()
+/mob/living/simple_animal/hostile/asteroid/goldgrub/death(var/gibbed = FALSE)
 	alerted = 0
 	Reward()
-	..()
+	..(gibbed)
 
 /mob/living/simple_animal/hostile/asteroid/hivelord
 	name = "hivelord"
@@ -264,9 +265,9 @@ obj/item/asteroid/basilisk_hide/New()
 /mob/living/simple_animal/hostile/asteroid/hivelord/AttackingTarget()
 	OpenFire()
 
-/mob/living/simple_animal/hostile/asteroid/hivelord/Die()
+/mob/living/simple_animal/hostile/asteroid/hivelord/death(var/gibbed = FALSE)
 	mouse_opacity = 1
-	..()
+	..(gibbed)
 	update_icons()
 
 /mob/living/simple_animal/hostile/asteroid/hivelord/update_icons()
@@ -313,7 +314,7 @@ obj/item/asteroid/basilisk_hide/New()
 
 /obj/item/asteroid/hivelord_core/process()
 	if(reagents && reagents.has_reagent(FROSTOIL, 5))
-		playsound(get_turf(src), 'sound/effects/glass_step.ogg', 50, 1)
+		playsound(src, 'sound/effects/glass_step.ogg', 50, 1)
 		desc = "All that remains of a hivelord, it seems to be what allows it to break pieces of itself off without being hurt. It is covered in a thin coat of frost."
 		processing_objects.Remove(src)
 		return
@@ -371,7 +372,7 @@ obj/item/asteroid/basilisk_hide/New()
 	else
 		to_chat(user, "<span class='notice'>You chomp into \the [src], barely managing to hold it down, but feel amazingly refreshed in mere moments.</span>")
 
-	playsound(get_turf(src), 'sound/items/eatfood.ogg', rand(10, 50), 1)
+	playsound(src, 'sound/items/eatfood.ogg', rand(10, 50), 1)
 	target.revive()
 
 	user.drop_from_inventory(src)
@@ -407,7 +408,8 @@ obj/item/asteroid/basilisk_hide/New()
 	spawn(100)
 		returnToPool(src)
 
-/mob/living/simple_animal/hostile/asteroid/hivelordbrood/Die()
+/mob/living/simple_animal/hostile/asteroid/hivelordbrood/death(var/gibbed = FALSE)
+	..(TRUE)
 	returnToPool(src)
 
 /mob/living/simple_animal/hostile/asteroid/goliath

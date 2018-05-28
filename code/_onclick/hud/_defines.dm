@@ -41,6 +41,7 @@
 #define ui_inv3 "CENTER:[16*PIXEL_MULTIPLIER],SOUTH:[5*PIXEL_MULTIPLIER]"			//borgs
 #define ui_borg_module "CENTER+1:[16*PIXEL_MULTIPLIER],SOUTH:[5*PIXEL_MULTIPLIER]" //borgs
 #define ui_borg_store "CENTER+2:[16*PIXEL_MULTIPLIER],SOUTH:[5*PIXEL_MULTIPLIER]"	//borgs
+
 #define ui_mommi_store "CENTER+1:[16*PIXEL_MULTIPLIER],SOUTH:[5*PIXEL_MULTIPLIER]"
 #define ui_mommi_module "CENTER:[16*PIXEL_MULTIPLIER],SOUTH:[5*PIXEL_MULTIPLIER]"
 #define ui_mommi_sight "CENTER-2:[16*PIXEL_MULTIPLIER],SOUTH:[5*PIXEL_MULTIPLIER]"
@@ -63,7 +64,6 @@
 #define ui_acti_alt "EAST-1:[28*PIXEL_MULTIPLIER],SOUTH:[5*PIXEL_MULTIPLIER]" //alternative intent switcher for when the interface is hidden (F12)
 
 #define ui_borg_pull "EAST-3:[24*PIXEL_MULTIPLIER],SOUTH+1:[7*PIXEL_MULTIPLIER]"
-//#define ui_borg_module "13:[26*PIXEL_MULTIPLIER],2:[7*PIXEL_MULTIPLIER]"
 #define ui_borg_panel "EAST-1:[28*PIXEL_MULTIPLIER],SOUTH+1:[7*PIXEL_MULTIPLIER]"
 
 //Gun buttons
@@ -78,6 +78,9 @@
 #define ui_alert3 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+3:[23*PIXEL_MULTIPLIER]"
 #define ui_alert4 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+2:[21*PIXEL_MULTIPLIER]"
 #define ui_alert5 "EAST-1:[28*PIXEL_MULTIPLIER],CENTER+1:[19*PIXEL_MULTIPLIER]"
+
+#define ui_borg_album "EAST-1:[28*PIXEL_MULTIPLIER],SOUTH+5:[7*PIXEL_MULTIPLIER]"	//borgs
+#define ui_borg_camera "EAST-1:[28*PIXEL_MULTIPLIER],SOUTH+4:[7*PIXEL_MULTIPLIER]"	//borgs
 
 //Middle right (status indicators)
 #define ui_health "EAST-1:[28*PIXEL_MULTIPLIER],CENTER:[15*PIXEL_MULTIPLIER]"

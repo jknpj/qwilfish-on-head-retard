@@ -238,6 +238,7 @@
 	wizard_garb = 1
 
 	species_restricted = null
+	allowed = list(/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/weapon/teleportation_scroll,/obj/item/weapon/gun/energy/staff)
 
 /obj/item/clothing/suit/space/rig/wizard/acidable()
 	return 0
@@ -294,7 +295,8 @@
 		/obj/item/ammo_storage,
 		/obj/item/ammo_casing,
 		/obj/item/weapon/handcuffs,
-		/obj/item/weapon/bikehorn/baton)
+		/obj/item/weapon/bikehorn/baton,
+		/obj/item/weapon/blunderbuss)
 	siemens_coefficient = 0.7
 	pressure_resistance = 40 * ONE_ATMOSPHERE
 

@@ -107,6 +107,8 @@
 		overlays.len = 0
 		return
 	var/rounded_vol = round(reagents.total_volume,5)
+	if(0 < reagents.total_volume && reagents.total_volume < 5)
+		rounded_vol = 5
 	overlays.len = 0
 	if(ismob(loc))
 		var/injoverlay
@@ -161,7 +163,7 @@
 				warning("Tried to draw blood or equivalent from [target] (\ref[target]) but it's missing their DNA datum!")
 				return
 
-			if (M_NOCLONE in T.mutations) // Target has been husked
+			if (M_HUSK in T.mutations) // Target has been husked
 				to_chat(user, "<span class='warning'>You are unable to locate any blood.</span>")
 				return
 

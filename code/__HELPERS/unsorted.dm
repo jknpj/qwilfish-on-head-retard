@@ -1261,7 +1261,7 @@ var/global/list/common_tools = list(
 /proc/can_operate(mob/living/carbon/M, mob/U)
 	if(U == M)
 		return 0
-	if(ishuman(M) && M.lying)
+	if((ishuman(M) || isslime(M)) && M.lying)
 		if(locate(/obj/machinery/optable,M.loc) || locate(/obj/structure/bed/roller/surgery, M.loc))
 			return 1
 		if(locate(/obj/structure/bed/roller, M.loc) && prob(75))
@@ -1679,13 +1679,6 @@ Game Mode config tags:
 /proc/sentStrikeTeams(var/team)
 	return (team in sent_strike_teams)
 
-
-/proc/area_in_map(var/area/A)
-	for (var/turf/T in A.area_turfs)
-		return TRUE
-	return FALSE
-
-
 /proc/get_exact_dist(atom/A, atom/B)	//returns the coordinate distance between the coordinates of the turfs of A and B
 	var/turf/T1 = A
 	var/turf/T2 = B
@@ -1713,17 +1706,17 @@ Game Mode config tags:
 
 	if(user)
 		user.drop_item(O, force_drop = TRUE)
-	
+
 	if(istype(O, /obj/item/weapon/grown))
 		var/obj/item/weapon/grown/F = O
 		if(F.plantname)
 			new_seed_type = plant_controller.seeds[F.plantname]
-	else 
+	else
 		if(istype(O, /obj/item/weapon/reagent_containers/food/snacks/grown))
 			var/obj/item/weapon/reagent_containers/food/snacks/grown/F = O
 			if(F.plantname)
 				new_seed_type = plant_controller.seeds[F.plantname]
-		else 
+		else
 			var/obj/item/F = O
 			if(F.nonplant_seed_type)
 				while(min_seeds <= produce)
@@ -1743,3 +1736,34 @@ Game Mode config tags:
 
 	qdel(O)
 	return TRUE
+
+//Same as block(Start, End), but only returns the border turfs
+//'Start' must be lower-left, 'End' must be upper-right
+/proc/block_borders(turf/Start, turf/End)
+	ASSERT(istype(Start))
+	ASSERT(istype(End))
+
+	//i'm a lazy cunt and I don't feel like making this work
+	ASSERT(Start.x < End.x && Start.y < End.y)
+
+	return block(Start, End) - block(locate(Start.x + 1, Start.y + 1, Start.z), locate(End.x - 1, End.y - 1, End.z))
+
+
+/proc/pick_rand_tele_turf(atom/hit_atom, var/inner_teleport_radius, var/outer_teleport_radius)
+	if((inner_teleport_radius < 1) || (outer_teleport_radius < inner_teleport_radius))
+		return 0
+
+	var/list/turfs = new/list()
+	var/turf/hit_turf = get_turf(hit_atom)
+	//This could likely use some standardization but I have no idea how to not break it.
+	for(var/turf/T in trange(outer_teleport_radius, hit_turf))
+		if(get_dist(T, hit_atom) <= inner_teleport_radius)
+			continue
+		if(is_blocked_turf(T) || istype(T, /turf/space))
+			continue
+		if(T.x > world.maxx-outer_teleport_radius || T.x < outer_teleport_radius)
+			continue
+		if(T.y > world.maxy-outer_teleport_radius || T.y < outer_teleport_radius)
+			continue
+		turfs += T
+	return pick(turfs)

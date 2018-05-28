@@ -108,7 +108,9 @@
 		L.forceMove(get_turf(src))
 		L.status_flags &= ~GODMODE
 		if(user)
-			to_chat(L, "<b>You have been released from your prison, but you are still bound to [user.name]'s will. Help them suceed in their goals at all costs.</b>")
+			to_chat(L, "<b>You have been released from your prison, but you are still bound to [user.name]'s will. Help them succeed in their goals at all costs.<br>\
+						Be warned, you are as fragile as glass and your attacks are not terribly strong. On the plus side, you fly and have no need for air.<br>\
+						You also cannot be stunned. If need be, your master can recapture you in the stone to heal you.</b>")
 		L.canmove = 1
 		L.cancel_camera()
 
@@ -262,6 +264,11 @@
 		if(ismob(target))
 			var/mob/M = target
 			true_name = M.real_name
+			for(var/obj/item/W in M)
+				M.drop_from_inventory(W)
+			if(iscarbon(M))
+				var/mob/living/carbon/C = M
+				C.dropBorers(1)
 			new /obj/effect/decal/cleanable/ash(get_turf(target))
 		else if(istype(target,/obj/item/organ/external/head))
 			var/obj/item/organ/external/head/H = target
@@ -270,7 +277,7 @@
 			new /obj/item/weapon/skull(get_turf(target))
 
 	//Scary sound
-	playsound(get_turf(src), get_sfx("soulstone"), 50,1)
+	playsound(src, get_sfx("soulstone"), 50,1)
 
 	//Creating a shade inside the stone and putting the victim in control
 	var/mob/living/simple_animal/shade/shadeMob = new(src)//put shade in stone
@@ -374,7 +381,7 @@
 								ticker.mode.cult+=Z.mind
 							ticker.mode.update_cult_icons_added(Z.mind)
 						qdel(T)
-						to_chat(Z, "<B>You are a Juggernaut. Though slow, your shell can withstand extreme punishment, your body can reflect energy and laser weapons, and you can create temporary shields that blocks pathing and projectiles. You fists can punch people and regular walls appart.</B>")
+						to_chat(Z, "<B>You are a Juggernaut. Though slow, your shell can withstand extreme punishment, your body can reflect energy and laser weapons, and you can create temporary shields that block pathing and projectiles. Your fists can punch people and regular walls apart.</B>")
 						to_chat(Z, "<B>You are still bound to serve your creator, follow their orders and help them complete their goals at all costs.</B>")
 						Z.cancel_camera()
 						deleteafter = 1

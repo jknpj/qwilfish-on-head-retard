@@ -117,3 +117,69 @@
 				else
 					H.vomit()
 				break
+
+/datum/dna/gene/disability/asthma
+	name = "Asthma"
+	desc = "A condition in which a person's airways become inflamed, narrow and swell, and produce extra mucus, which makes it difficult to breathe."
+	activation_message = "You feel short of breath."
+	deactivation_message = "You can breathe normally again."
+	disability= ASTHMA
+
+	mutation = M_ASTHMA
+
+/datum/dna/gene/disability/asthma/New()
+	..()
+	block = ASTHMABLOCK
+
+
+var/list/milk_reagents = list(
+		MILK,
+		CREAM,
+		VIRUSFOOD,
+		OFFCOLORCHEESE,
+		CHEESYGLOOP,
+		ALOE,
+		BANANAHONK,
+		BILK,
+		CAFE_LATTE,
+		MILKSHAKE,
+		BAREFOOT,
+		PINACOLADA,
+		BOOGER,
+		BROWNSTAR,
+		IRISHCARBOMB,
+		IRISHCOFFEE,
+		IRISHCREAM,
+		SILENCER,
+		DOCTORSDELIGHT,
+		WHITERUSSIAN,
+		ANTIFREEZE)
+
+
+/datum/dna/gene/disability/lactose
+	name = "Lactose intolerance"
+	desc = "A condition where your body is unable to digest Lactose, a sugar commonly found in milk."
+	activation_message = ""
+	deactivation_message = ""
+	disability = LACTOSE
+
+	mutation = M_LACTOSE
+
+/datum/dna/gene/disability/lactose/New()
+	..()
+	block = LACTOSEBLOCK
+
+/datum/dna/gene/disability/lactose/OnMobLife(var/mob/living/carbon/human/H)
+	if(!istype(H))
+		return
+
+	if(prob(10))
+		for(var/R in milk_reagents)
+			if(H.reagents.has_reagent(R))
+				to_chat(H, "<span class='warning'>Your body rejects the [reagent_name(R)]!</span>")
+
+				if(H.lastpuke) //If already puking, add some toxins
+					H.adjustToxLoss(2.5)
+				else
+					H.vomit()
+				break
