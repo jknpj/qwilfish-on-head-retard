@@ -192,7 +192,7 @@
 				clear_alert("nutrition")
 			if(150 to 250)
 				throw_alert("nutrition","hungry")
-			else
+			if(149 to -INFINITY)
 				throw_alert("nutrition","starving")
 
 		if(ticker && ticker.hardcore_mode) //Hardcore mode: flashing nutrition indicator when starving!
