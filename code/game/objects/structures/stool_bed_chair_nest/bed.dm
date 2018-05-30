@@ -79,7 +79,7 @@
 			"You hear metal clanking.")
 	playsound(src, 'sound/misc/buckle_unclick.ogg', 50, 1)
 	unlock_atom(M)
-	M.clear_alert("buckled")
+	M.clear_alert(SA_OBJ_BUCKLED)
 
 	add_fingerprint(user)
 
@@ -122,7 +122,7 @@
 	add_fingerprint(user)
 
 	lock_atom(M, lock_type)
-	M.throw_alert("buckled", new_master = src)
+	M.throw_alert(SA_OBJ_BUCKLED, new_master = src)
 
 	if(M.pulledby)
 		M.pulledby.start_pulling(src)

@@ -102,9 +102,7 @@
 
 	if(!breath || (breath.total_moles == 0))
 		adjustOxyLoss(7)
-
-		throw_alert("oxy")
-
+		throw_alert(SA_OXYGEN)
 		return 0
 
 
@@ -133,11 +131,11 @@
 		var/ratio = safe_oxygen_min/O2_pp
 		adjustOxyLoss(min(5*ratio, 7)) // Don't fuck them up too fast (space only does 7 after all!)
 		oxygen_used = breath.oxygen*ratio/6
-		throw_alert("oxy")
+		throw_alert(SA_OXYGEN)
 	else 									// We're in safe limits
 		adjustOxyLoss(-5)
 		oxygen_used = breath.oxygen/6
-		clear_alert("oxy")
+		clear_alert(SA_OXYGEN)
 
 	breath.oxygen -= oxygen_used
 	breath.carbon_dioxide += oxygen_used
@@ -162,9 +160,9 @@
 		if(ratio)
 			if(reagents)
 				reagents.add_reagent(PLASMA, Clamp(ratio, MIN_PLASMA_DAMAGE, MAX_PLASMA_DAMAGE))
-			throw_alert("tox_in_air")
+			throw_alert(SA_TOXINS)
 	else
-		clear_alert("tox_in_air")
+		clear_alert(SA_TOXINS)
 
 	if(breath.trace_gases.len)	// If there's some other shit in the air lets deal with it here.
 		for(var/datum/gas/sleeping_agent/SA in breath.trace_gases)
@@ -181,9 +179,9 @@
 	if(breath.temperature > (T0C+66)) // Hot air hurts :(
 		if(prob(20))
 			to_chat(src, "<span class='warning'>You feel a searing heat in your lungs!</span>")
-		throw_alert("temp","hot",1)
+		throw_alert(SCREEN_ALARM_TEMPERATURE,SA_HEAT,1)
 	else
-		clear_alert("temp")
+		clear_alert(SCREEN_ALARM_TEMPERATURE)
 
 
 	//Temporary fixes to the alerts.
@@ -218,21 +216,21 @@
 	switch(adjusted_pressure)
 		if(HAZARD_HIGH_PRESSURE to INFINITY)
 			adjustBruteLoss( min( ( (adjusted_pressure / HAZARD_HIGH_PRESSURE) -1 )*PRESSURE_DAMAGE_COEFFICIENT , MAX_HIGH_PRESSURE_DAMAGE) )
-			throw_alert("pressure","highpressure",2)
+			throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_HIGH,2)
 		if(WARNING_HIGH_PRESSURE to HAZARD_HIGH_PRESSURE)
-			throw_alert("pressure","highpressure",1)
+			throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_HIGH,1)
 		if(WARNING_LOW_PRESSURE to WARNING_HIGH_PRESSURE)
-			clear_alert("pressure")
+			clear_alert(SCREEN_ALARM_PRESSURE)
 		if(HAZARD_LOW_PRESSURE to WARNING_LOW_PRESSURE)
 			if(!spaceproof)
-				throw_alert("pressure","lowpressure",1)
+				throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_LOW,1)
 		else
 			if(!spaceproof)
 				if( !(M_RESIST_COLD in mutations) )
 					adjustBruteLoss( LOW_PRESSURE_DAMAGE )
-					throw_alert("pressure","lowpressure",2)
+					throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_LOW,2)
 				else
-					throw_alert("pressure","lowpressure",1)
+					throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_LOW,1)
 
 /mob/living/carbon/complex/proc/is_spaceproof()
 	if(flags & INVULNERABLE)

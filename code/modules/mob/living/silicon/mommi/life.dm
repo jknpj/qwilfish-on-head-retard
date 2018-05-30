@@ -185,21 +185,21 @@
 		if(static_overlays && static_overlays.len)
 			remove_static_overlays()
 
-	if(src.cell)
+	if(cell)
 		var/cellcharge = src.cell.charge/src.cell.maxcharge
 		switch(cellcharge)
 			if(0.75 to INFINITY)
-				clear_alert("charge")
+				clear_alert(SCREEN_ALARM_CHARGE)
 			if(0.5 to 0.75)
-				throw_alert("charge","lowcell",1)
+				throw_alert(SCREEN_ALARM_CHARGE,SA_CELL_LOW,1)
 			if(0.25 to 0.5)
-				throw_alert("charge","lowcell",2)
+				throw_alert(SCREEN_ALARM_CHARGE,SA_CELL_LOW,2)
 			if(0 to 0.25)
-				throw_alert("charge","lowcell",3)
-			else
-				throw_alert("charge","emptycell")
+				throw_alert(SCREEN_ALARM_CHARGE,SA_CELL_LOW,3)
+			if(0)
+				throw_alert(SCREEN_ALARM_CHARGE,SA_CELL_EMPTY)
 	else
-		throw_alert("charge","nocell")
+		throw_alert(SCREEN_ALARM_CHARGE,SA_CELL_MISSING)
 
 	update_pull_icon()
 //Oxygen and fire does nothing yet!!

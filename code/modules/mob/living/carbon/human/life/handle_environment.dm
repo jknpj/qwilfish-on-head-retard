@@ -23,15 +23,15 @@
 				bodytemperature += min((1 - thermal_protection) * ((loc_temp - get_skin_temperature()) / BODYTEMP_HEAT_DIVISOR), BODYTEMP_HEATING_MAX)
 
 	if (status_flags & GODMODE)
-		clear_alert("temp")
-		clear_alert("pressure")
+		clear_alert(SCREEN_ALARM_TEMPERATURE)
+		clear_alert(SCREEN_ALARM_PRESSURE)
 		return
 
 	// Slimed carbons are protected against heat damage
 	if (bodytemperature < BODYTEMP_COLD_DAMAGE_LIMIT || (bodytemperature > BODYTEMP_HEAT_DAMAGE_LIMIT && dna.mutantrace != "slime"))
 		// Update fire/cold overlay
 		var/temp_alert = (bodytemperature < BODYTEMP_COLD_DAMAGE_LIMIT) ? 1 : 2
-		throw_alert("temp","hot",temp_alert)
+		throw_alert(SCREEN_ALARM_TEMPERATURE,SA_HEAT,temp_alert)
 		if(!(istype(loc, /obj/machinery/atmospherics/unary/cryo_cell)))
 			if (dna.mutantrace != "slime")
 				var/temp_damage = get_body_temperature_damage(bodytemperature)
@@ -40,7 +40,7 @@
 			else // Slimed carbons get toxin instead of cold damage
 				adjustToxLoss(round(BODYTEMP_HEAT_DAMAGE_LIMIT - bodytemperature))
 	else
-		clear_alert("temp")
+		clear_alert(SCREEN_ALARM_TEMPERATURE)
 
 	//Account for massive pressure differences.  Done by Polymorph
 	//Made it possible to actually have something that can protect against high pressure... Done by Errorage. Polymorph now has an axe sticking from his head for his previous hardcoded nonsense!
@@ -48,21 +48,21 @@
 	var/adjusted_pressure = calculate_affecting_pressure(pressure) //Returns how much pressure actually affects the mob.
 	if(adjusted_pressure >= species.hazard_high_pressure)
 		adjustBruteLoss(min(((adjusted_pressure/species.hazard_high_pressure) - 1) * PRESSURE_DAMAGE_COEFFICIENT, MAX_HIGH_PRESSURE_DAMAGE))
-		throw_alert("pressure","highpressure",2)
+		throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_HIGH,2)
 	else if(adjusted_pressure >= species.warning_high_pressure)
-		throw_alert("pressure","highpressure",1)
+		throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_HIGH,1)
 	else if(adjusted_pressure >= species.warning_low_pressure)
-		clear_alert("pressure")
+		clear_alert(SCREEN_ALARM_PRESSURE)
 	else if(adjusted_pressure >= species.hazard_low_pressure)
-		throw_alert("pressure","lowpressure",1)
+		throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_LOW,1)
 	else
 		if(!(M_RESIST_COLD in mutations))
 			adjustBruteLoss(LOW_PRESSURE_DAMAGE)
 			if(istype(src.loc, /turf/space))
 				adjustBruteLoss(LOW_PRESSURE_DAMAGE) //Space doubles damage (for some reason space vacuum is not station vacuum, nice snowflake)
-			throw_alert("pressure","lowpressure",2)
+			throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_LOW,2)
 		else
-			throw_alert("pressure","lowpressure",1)
+			throw_alert(SCREEN_ALARM_PRESSURE,SA_PRESSURE_LOW,1)
 
 	if((environment.toxins / environment.volume * CELL_VOLUME) > MOLES_PLASMA_VISIBLE)
 		pl_effects()

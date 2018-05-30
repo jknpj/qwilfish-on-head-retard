@@ -202,3 +202,35 @@
 #define ui_blob_ping "EAST-1:[24*PIXEL_MULTIPLIER],CENTER+3:[21*PIXEL_MULTIPLIER]"
 #define ui_blob_rally "EAST-1:[24*PIXEL_MULTIPLIER],CENTER+4:[25*PIXEL_MULTIPLIER]"
 #define ui_blob_taunt "EAST-1:[24*PIXEL_MULTIPLIER],CENTER+5:[29*PIXEL_MULTIPLIER]"
+
+//Screen alarms
+
+//Atmos
+#define SA_OXYGEN /obj/abstract/screen/alert/oxy
+#define SA_TOXINS /obj/abstract/screen/alert/tox_in_air
+#define SA_TOXINS_XENO /obj/abstract/screen/alert/alien_tox
+
+#define SCREEN_ALARM_TEMPERATURE "temp"
+#define SA_HEAT /obj/abstract/screen/alert/hot
+#define SA_HEAT_XENO /obj/abstract/screen/alert/alien_fire
+#define SA_COLD /obj/abstract/screen/alert/cold
+
+#define SCREEN_ALARM_PRESSURE "pressure"
+#define SA_PRESSURE_LOW /obj/abstract/screen/alert/lowpressure
+#define SA_PRESSURE_HIGH /obj/abstract/screen/alert/highpressure
+
+//Nutrition
+#define SCREEN_ALARM_NUTRITION "nutrition"
+#define SA_FAT /obj/abstract/screen/alert/fat
+#define SA_HUNGRY /obj/abstract/screen/alert/hungry
+#define SA_STARVING /obj/abstract/screen/alert/starving
+
+//Cell
+#define SCREEN_ALARM_CHARGE "charge"
+#define SA_CELL_MISSING /obj/abstract/screen/alert/nocell
+#define SA_CELL_EMPTY /obj/abstract/screen/alert/emptycell
+#define SA_CELL_LOW /obj/abstract/screen/alert/lowcell
+
+//Obj
+#define SA_OBJ_BUCKLED /obj/abstract/screen/alert/buckled
+#define SA_OBJ_HANDCUFFS /obj/abstract/screen/alert/handcuffed

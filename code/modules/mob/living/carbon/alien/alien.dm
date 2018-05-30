@@ -138,7 +138,7 @@ In all, this is a lot like the monkey code. /N
 
 	// +/- 50 degrees from 310.15K is the 'safe' zone, where no damage is dealt.
 	if(bodytemperature > 360.15) //Body temperature is too hot.
-		throw_alert("alien_fire")
+		throw_alert(SA_HEAT_XENO)
 		switch(bodytemperature)
 			if(360 to 400)
 				apply_damage(HEAT_DAMAGE_LEVEL_1, BURN)
@@ -150,7 +150,7 @@ In all, this is a lot like the monkey code. /N
 				else
 					apply_damage(HEAT_DAMAGE_LEVEL_2, BURN)
 	else
-		clear_alert("alien_fire")
+		clear_alert(SA_HEAT_XENO)
 
 /mob/living/carbon/alien/proc/handle_mutations_and_radiation()
 

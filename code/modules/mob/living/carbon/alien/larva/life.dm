@@ -157,14 +157,11 @@
 	var/Toxins_pp = (breath.toxins / breath.total_moles()) * breath.pressure
 
 	if(Toxins_pp) // Detect toxins in air
-
 		AdjustPlasma(breath.toxins*250)
-		throw_alert("alien_tox")
-
+		throw_alert(SA_TOXINS_XENO)
 		toxins_used = breath.toxins
-
 	else
-		clear_alert("alien_tox")
+		clear_alert(SA_TOXINS_XENO)
 
 	//Breathe in toxins and out oxygen
 	breath.toxins -= toxins_used
@@ -173,9 +170,9 @@
 	if(breath.temperature > (T0C+66) && !(M_RESIST_HEAT in mutations)) // Hot air hurts :(
 		if(prob(20))
 			to_chat(src, "<span class='danger'>You feel a searing heat in your lungs !</span>")
-		throw_alert("alien_fire")
+		throw_alert(SA_HEAT_XENO)
 	else
-		clear_alert("alien_fire")
+		clear_alert(SA_HEAT_XENO)
 
 	return 1
 

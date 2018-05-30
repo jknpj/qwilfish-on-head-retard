@@ -187,17 +187,17 @@
 
 		switch(nutrition)
 			if(450 to INFINITY)
-				throw_alert("nutrition","fat")
+				throw_alert(SCREEN_ALARM_NUTRITION,SA_FAT)
 			if(250 to 350)
-				clear_alert("nutrition")
+				clear_alert(SCREEN_ALARM_NUTRITION)
 			if(150 to 250)
-				throw_alert("nutrition","hungry")
+				throw_alert(SCREEN_ALARM_NUTRITION,SA_HUNGRY)
 			if(149 to -INFINITY)
-				throw_alert("nutrition","starving")
+				throw_alert(SCREEN_ALARM_NUTRITION,SA_STARVING)
 
 		if(ticker && ticker.hardcore_mode) //Hardcore mode: flashing nutrition indicator when starving!
 			if(nutrition < STARVATION_MIN)
-				throw_alert("nutrition","starving")
+				throw_alert(SCREEN_ALARM_NUTRITION,SA_STARVING)
 
 		update_pull_icon()
 
