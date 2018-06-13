@@ -732,3 +732,10 @@
 	icon_state = "britpolice"
 	item_state = "britpolice"
 	_color = "britpolice"
+
+/obj/item/clothing/under/gal
+	name = "gal suit"
+	desc = ""
+	icon_state = "galo"
+	item_state = "galo"
+	_color = "gal"

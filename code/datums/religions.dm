@@ -910,3 +910,24 @@
 	H.h_style = "Big Afro"
 	H.f_style = "Full Beard"
 	H.update_hair()
+
+/datum/religion/gal
+	name = "Gyaru-kei"
+	deity_name = "Gyaru-O-Sengen"
+	bible_name = "Men's Egg"
+	male_adept = "Gyaru-O"
+	female_adept = "Gyaru"
+	keys = list("galo", "tan", "gal-o-sengen", "gal", "gyaru", "gyaruo")
+
+/datum/religion/gal/equip_chaplain(var/mob/living/carbon/human/H)
+	H.equip_or_collect(new /obj/item/clothing/under/gal(H), slot_w_uniform)
+	H.GALize()
+
+/datum/religion/gal/convertCeremony(var/mob/living/preacher, var/mob/living/subject)
+	if(..())
+		if(ishuman(subject))
+			var/mob/living/carbon/human/H = subject
+			new /datum/effect/effect/system/smoke_spread(H.loc)
+			H.say("Yeah, [deity_name]!")
+			H.GALize()
+		return TRUE
