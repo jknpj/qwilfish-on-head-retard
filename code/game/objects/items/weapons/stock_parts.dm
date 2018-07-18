@@ -232,3 +232,36 @@
 	desc = "A large piece of equipment used to open a window into the subspace dimension."
 	origin_tech = Tc_MAGNETS + "=5;" + Tc_MATERIALS + "=5;" + Tc_BLUESPACE + "=3"
 	starting_materials = list(MAT_IRON = 50)
+
+//Clockwork components.
+
+/obj/item/weapon/stock_parts/capacitor/geis
+	name = "geis capacitor"
+	desc = "It's as if it really doesn't doesn't appreciate being held."
+	icon_state = "geis_capacitor"
+	origin_tech = Tc_ANOMALY + "=1"
+//	starting_materials = list(MAT_BRASS = 150, MAT_RALLOY = 150)
+
+/obj/item/weapon/stock_parts/capacitor/geis/attackby(obj/item/weapon/W, mob/user)
+	return //The charge rate doesn't really matter if this can't be used by railguns.
+
+/obj/item/weapon/stock_parts/scanning_module/belligerent
+	name = "belligerent eye"
+	desc = "It's as if it's looking for something to hurt."
+	icon_state = "belligerent_eye"
+	origin_tech = Tc_ANOMALY + "=4"
+//	starting_materials = list(MAT_BRASS = 300, MAT_GLASS = 300)
+
+/obj/item/weapon/stock_parts/manipulator/vanguard
+	name = "vanguard cogwheel"
+	desc = "It's as if it's trying to comfort you with its glow."
+	icon_state = "vanguard_cog"
+	origin_tech = Tc_ANOMALY + "=3"
+//	starting_materials = list(MAT_BRASS = 500)
+
+/obj/item/weapon/stock_parts/micro_laser/hierophant
+	name = "hierophant ansible"
+	desc = "It's as if it's trying to say something..."
+	icon_state = "hierophant_ansible"
+	origin_tech = Tc_ANOMALY + "=2"
+//	starting_materials = list(MAT_BRASS = 400)
