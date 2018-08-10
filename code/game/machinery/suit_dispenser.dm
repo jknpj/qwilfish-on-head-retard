@@ -259,6 +259,17 @@ var/list/dispenser_presets = list()
 /datum/suit/dorf/mining
 	name = "Mining"
 	to_spawn = list(/obj/item/clothing/suit/space/rig/mining, /obj/item/clothing/head/helmet/space/rig/mining)
+	amount = 1
+
+/datum/suit/dorf/survivor
+	name = "Survivor"
+	to_spawn = list(/obj/item/clothing/suit/space/rig/ror, /obj/item/clothing/head/helmet/space/rig/ror)
+	amount = 1
+
+/datum/suit/dorf/xenoarch
+	name = "Xenoarchaeology"
+	to_spawn = list(/obj/item/clothing/suit/space/anomaly, /obj/item/clothing/head/helmet/space/anomaly)
+	amount = 1
 
 /*/datum/suit/dorf/head
 	amount = 1
@@ -304,3 +315,13 @@ var/list/dispenser_presets = list()
 	desc = "An industrial U-Tak-It Dispenser unit designed to fetch a specific mass produced suit."
 	dispenser_flags = SD_ONESUIT|SD_NOGREED|SD_UNLIMITED
 	one_suit = /datum/suit/dorf/standard
+
+/obj/machinery/suit_dispenser/roidstation
+	desc = "An industrial U-Tak-It Dispenser unit designed to fetch a specific asteroid-dwelving space suit."
+	dispenser_flags = SD_ONESUIT
+	one_suit = /datum/suit/dorf/survivor
+
+/obj/machinery/suit_dispenser/roidstation
+	desc = "An industrial U-Tak-It Dispenser unit designed to fetch all kinds of asteroid-dwelving space suits."
+	dispenser_flags = SD_NOGREED
+	suits = list(/datum/suit/dorf/survivor,/datum/suit/dorf/mining,/datum/suit/dorf/xenoarch)
