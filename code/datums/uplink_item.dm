@@ -1,6 +1,6 @@
 var/list/uplink_items = list()
 
-/proc/get_uplink_items(var/job = null)
+/proc/get_uplink_items(var/job = null, var/list/roles = null)
 	// If not already initialized..
 	if(!uplink_items.len)
 
@@ -9,12 +9,19 @@ var/list/uplink_items = list()
 
 		var/list/last = list()
 		for(var/item in typesof(/datum/uplink_item))
-
 			var/datum/uplink_item/I = new item()
 			if(!I.item)
 				continue
-			if(I.gamemodes.len && ticker && !(ticker.mode.name in I.gamemodes))
-				continue
+			if(I.job && I.job.len)
+				if(!(I.job.Find(job)))
+					continue
+			if((I.roles && I.roles.len) && (roles && roles.len))
+				var/role_found = FALSE
+				for(var/role in roles)
+					if(I.roles.Find(role))
+						role_found = TRUE
+				if(!role_found)
+					continue
 			if(I.excludefrom.len && ticker && (ticker.mode.type in I.excludefrom))
 				continue
 			if(I.last)
@@ -51,9 +58,9 @@ var/list/uplink_items = list()
 	var/cost = 0
 	var/last = 0 // Appear last
 	var/abstract = 0
-	var/list/gamemodes = list() // Empty list means it is in all the gamemodes. Otherwise place the gamemode name here.
 	var/list/excludefrom = list() //Empty list does nothing. Place the name of gamemode you don't want this item to be available in here.
 	var/list/job = null
+	var/list/roles = null
 	var/only_on_month	//two-digit month as string
 	var/only_on_day		//two-digit day as string
 	var/num_in_stock = 0	// Number of times this can be bought, globally. 0 is infinite
@@ -439,7 +446,7 @@ var/list/uplink_items = list()
 
 //Nuke Ops Prices
 /datum/uplink_item/nukeprice
-	gamemodes = list("nuclear emergency")
+	roles = list(NUKE_OP)
 
 /datum/uplink_item/nukeprice/crossbow
 	name = "Energy Crossbow"
@@ -528,7 +535,7 @@ var/list/uplink_items = list()
 	desc = "A huge minigun. Makes up for its lack of mobility and discretion with sheer firepower. Has 200 bullets."
 	item = /obj/item/weapon/gun/gatling
 	cost = 40
-	gamemodes = list("nuclear emergency")
+	roles = list(NUKE_OP)
 
 // STEALTHY WEAPONS
 
@@ -723,14 +730,14 @@ var/list/uplink_items = list()
 	desc = "A printed circuit board that completes the teleporter onboard the mothership. It is advised to test fire the teleporter before entering it, as malfunctions can occur."
 	item = /obj/item/weapon/circuitboard/teleporter
 	cost = 40
-	gamemodes = list("nuclear emergency")
+	roles = list(NUKE_OP)
 
 /datum/uplink_item/device_tools/popout_cake
 	name = "Pop-Out Cake"
 	desc = "A massive and delicious cake, big enough to store a person inside. It's equipped with a one-use party horn and special effects, and can be cut into edible slices in case of an emergency."
 	item = /obj/structure/popout_cake
 	cost = 6
-	gamemodes = list("nuclear emergency")
+	roles = list(NUKE_OP)
 
 /datum/uplink_item/device_tools/does_not_tip_note
 	name = "\"Does Not Tip\" database backdoor"
@@ -739,13 +746,13 @@ var/list/uplink_items = list()
 	num_in_stock = 1
 	cost = 10
 
-//datum/uplink_item/dangerous/robot
-//	name = "Syndicate Robot Teleporter"
-//	desc = "A single-use teleporter used to deploy a syndicate robot that will help with your mission. Keep in mind that unlike NT cyborgs/androids these don't have access to most of the station's machinery."
-//	item = /obj/item/weapon/robot_spawner/syndicate
-//	cost = 40
-//	gamemodes = list("nuclear emergency")
-//	refundable = TRUE
+/datum/uplink_item/dangerous/robot
+	name = "Syndicate Robot Teleporter"
+	desc = "A single-use teleporter used to deploy a syndicate robot that will help with your mission. Keep in mind that unlike NT cyborgs/androids these don't have access to most of the station's machinery."
+	item = /obj/item/weapon/robot_spawner/syndicate
+	cost = 28
+	roles = list(NUKE_OP)
+	refundable = TRUE
 
 // IMPLANTS
 

@@ -9,11 +9,16 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 /obj/item/device/uplink
 	var/welcome 					// Welcoming menu message
 	var/uses 						// Numbers of crystals
+
 	// List of items not to shove in their hands.
 	var/list/purchase_log = list()
+	var/list/buyable_items = list()
 	var/show_description = null
-	var/active = 0
+
+	var/active = FALSE
+
 	var/job = null
+	var/list/roles = null
 
 /obj/item/device/uplink/New()
 	..()
@@ -44,21 +49,25 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 				qdel(I)
 
 //Let's build a menu!
-/obj/item/device/uplink/proc/generate_menu(mob/user as mob)
+/obj/item/device/uplink/proc/generate_menu(mob/user)
+	if(!user)
+		return
 	if(!job)
 		job = user.mind.assigned_role
+	if(!roles && user.mind.antag_roles.len)
+		roles = user.mind.antag_roles.Copy()
+	buyable_items = get_uplink_items(job, roles)
 	var/dat = "<B>[src.welcome]</B><BR>"
 
 	dat += {"Tele-Crystals left: [src.uses]<BR>
 		<HR>
 		<B>Request item:</B><BR>
 		<I>Each item costs a number of tele-crystals as indicated by the number following their name.</I><br><BR>"}
-	var/list/buyable_items = get_uplink_items()
+	
 
 	// Loop through categories
 	var/index = 0
 	for(var/category in buyable_items)
-
 		index++
 		dat += "<b>[category]</b><br>"
 
@@ -67,15 +76,8 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 		// Loop through items in category
 		for(var/datum/uplink_item/item in buyable_items[category])
 			i++
-
 			var/cost_text = ""
 			var/desc = "[item.desc]"
-			if(item.job && item.job.len)
-				if(!(item.job.Find(job)))
-					//world.log << "Skipping job item that doesn't match"
-					continue
-				else
-					//world.log << "Found matching job item"
 			if(item.cost > 0)
 				cost_text = "([item.cost])"
 			if(item.cost <= uses)
@@ -106,8 +108,6 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 		</font></body>"}
 	user << browse(dat, "window=hidden")
 	onclose(user, "hidden")
-	return
-
 
 /obj/item/device/uplink/Topic(href, href_list)
 	..()
@@ -124,7 +124,7 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 			var/category = split[1]
 			var/number = text2num(split[2])
 
-			var/list/buyable_items = get_uplink_items()
+			buyable_items = get_uplink_items(job, roles)
 
 			var/list/uplink = buyable_items[category]
 			if(uplink && uplink.len >= number)
@@ -168,7 +168,7 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 	if(href_list["lock"])
 		toggle()
 		usr << browse(null, "window=hidden")
-		return 1
+		return TRUE
 
 // Toggles the uplink on and off. Normally this will bypass the item's normal functions and go to the uplink menu, if activated.
 /obj/item/device/uplink/hidden/proc/toggle()
@@ -186,20 +186,18 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 /obj/item/device/uplink/hidden/proc/check_trigger(mob/user as mob, var/value, var/target)
 	if(value == target)
 		trigger(user)
-		return 1
-	return 0
+		return TRUE
+	return FALSE
 
 // I placed this here because of how relevant it is.
 // You place this in your uplinkable item to check if an uplink is active or not.
 // If it is, it will display the uplink menu and return 1, else it'll return false.
 // If it returns true, I recommend closing the item's normal menu with "user << browse(null, "window=name")"
 /obj/item/proc/active_uplink_check(mob/user as mob)
-	// Activates the uplink if it's active
-	if(src.hidden_uplink)
-		if(src.hidden_uplink.active)
-			src.hidden_uplink.trigger(user)
-			return 1
-	return 0
+	if(hidden_uplink && hidden_uplink.active) // Activates the uplink if it's active
+		hidden_uplink.trigger(user)
+		return TRUE
+	return FALSE
 
 // PRESET UPLINKS
 // A collection of preset uplinks.
