@@ -2276,6 +2276,7 @@
 #include "code\modules\spells\general\area_teleport.dm"
 #include "code\modules\spells\general\cloak.dm"
 #include "code\modules\spells\general\lightning.dm"
+#include "code\modules\spells\general\hocuspocus.dm"
 #include "code\modules\spells\general\menace.dm"
 #include "code\modules\spells\general\reflect_pain.dm"
 #include "code\modules\spells\general\rejuvenate.dm"
