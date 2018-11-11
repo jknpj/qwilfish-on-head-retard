@@ -12,13 +12,11 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 
 	// List of items not to shove in their hands.
 	var/list/purchase_log = list()
-	var/list/buyable_items = list()
 	var/show_description = null
 
 	var/active = FALSE
 
-	var/job = null
-	var/list/roles = null
+	var/datum/mind/uplink_owner = null
 
 /obj/item/device/uplink/New()
 	..()
@@ -35,34 +33,40 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 		uses = 90 // Because this is only happening on centcomm's snowflake uplink
 
 /obj/item/device/uplink/proc/refund(mob/user)
-	if(!user)
+	if(!user || !is_holder_of(user, src))
 		return
+
 	var/obj/item/I = user.get_active_hand()
+
 	if(I) // Make sure there's actually something in the hand before even bothering to check
-		for(var/item in typesof(/datum/uplink_item))
-			var/datum/uplink_item/UI = item
-			var/cost = UI.refund_amount ? UI.refund_amount : UI.cost
-			var/refundable = initial(UI.refundable)
-			if(refundable && I.check_uplink_validity())
+		for(var/item in subtypesof(/datum/uplink_item))
+			var/datum/uplink_item/UI = new item
+			var/path = UI.refund_path || UI.item
+			var/cost = UI.refund_amount || UI.cost
+			if(I.type == path && UI.refundable && I.check_uplink_validity())
 				uses += cost
 				to_chat(user, "<span class='notice'>[I] refunded.</span>")
 				qdel(I)
+			qdel(UI)
+		interact(user)
 
 //Let's build a menu!
 /obj/item/device/uplink/proc/generate_menu(mob/user)
-	if(!user)
+	if(!(user && user.mind))
 		return
-	if(!job)
-		job = user.mind.assigned_role
-	if(!roles && user.mind.antag_roles.len)
-		roles = user.mind.antag_roles.Copy()
-	buyable_items = get_uplink_items(job, roles)
+	if(!uplink_owner)
+		uplink_owner = user.mind
+
+	var/list/buyable_items = get_uplink_items(uplink_owner)
+
 	var/dat = "<B>[src.welcome]</B><BR>"
 
-	dat += {"Tele-Crystals left: [src.uses]<BR>
+	dat += {"
+		Tele-Crystals left: [src.uses]<BR>
 		<HR>
 		<B>Request item:</B><BR>
-		<I>Each item costs a number of tele-crystals as indicated by the number following their name.</I><br><BR>"}
+		<I>Each item costs a number of tele-crystals as indicated by the number following their name.</I><br><BR>
+		"}
 	
 
 	// Loop through categories
@@ -84,9 +88,11 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 				dat += "<A href='byond://?src=\ref[src];buy_item=[url_encode(category)]:[i];'>[item.name]</A> [cost_text] "
 			else
 				dat += "<font color='grey'><i>[item.name] [cost_text] </i></font>"
+			if(item.refundable)
+				dat += "<A href='byond://?src=\ref[src];refund=1'><font size=2>\[refund\]</font></A>"
 			if(item.desc)
 				if(show_description == 2)
-					dat += "<A href='byond://?src=\ref[src];show_desc=1'><font size=2>\[-\]</font></A><BR><font size=2>[desc]</font>"
+					dat += "<A href='byond://?src=\ref[src];show_desc=1'><font size=2>\[-\]</font></A><BR><font size=2>[desc][item.refundable ? "To refund this item: Put it in your active hand then press refund.":""]</font>"
 				else
 					dat += "<A href='byond://?src=\ref[src];show_desc=2'><font size=2>\[?\]</font></A>"
 			dat += "<BR>"
@@ -112,14 +118,17 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 /obj/item/device/uplink/Topic(href, href_list)
 	..()
 
-	if (!is_holder_of(usr, src))
+	if(!is_holder_of(usr, src))
 		message_admins("[usr] tried to access [src], an unlocked PDA, despite not being its holder.")
 		return FALSE
 
 	if(!active)
 		return
+	
+	if(href_list["refund"])
+		refund(usr)
 
-	if (href_list["buy_item"])
+	if(href_list["buy_item"])
 
 		var/item = href_list["buy_item"]
 		var/list/split = splittext(item, ":") // throw away variable
@@ -129,8 +138,7 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 			var/category = split[1]
 			var/number = text2num(split[2])
 
-			buyable_items = get_uplink_items(job, roles)
-
+			var/list/buyable_items = get_uplink_items(uplink_owner)
 			var/list/uplink = buyable_items[category]
 			if(uplink && uplink.len >= number)
 				var/datum/uplink_item/I = uplink[number]
@@ -142,10 +150,11 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 				message_admins(text)
 				log_game(textalt)
 				admin_log.Add(textalt)
-
+	
 	else if(href_list["show_desc"])
 		show_description = text2num(href_list["show_desc"])
 		interact(usr)
+
 
 // HIDDEN UPLINK - Can be stored in anything but the host item has to have a trigger for it.
 /* How to create an uplink in 3 easy steps!

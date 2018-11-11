@@ -1,6 +1,6 @@
 var/list/uplink_items = list()
 
-/proc/get_uplink_items(var/job = null, var/list/roles = null)
+/proc/get_uplink_items(var/datum/mind/uplink_owner = null)
 	// If not already initialized..
 	if(!uplink_items.len)
 
@@ -12,15 +12,11 @@ var/list/uplink_items = list()
 			var/datum/uplink_item/I = new item()
 			if(!I.item)
 				continue
-			if(I.job && I.job.len)
-				if(!(I.job.Find(job)))
+			if((I.job && I.job.len) && uplink_owner)
+				if(!(I.job.Find(uplink_owner.assigned_role)))
 					continue
-			if((I.roles && I.roles.len) && (roles && roles.len))
-				var/role_found = FALSE
-				for(var/role in roles)
-					if(I.roles.Find(role))
-						role_found = TRUE
-				if(!role_found)
+			if(I.requires_role && uplink_owner)
+				if(!uplink_owner.GetRole(I.requires_role))
 					continue
 			if(I.excludefrom.len && ticker && (ticker.mode.type in I.excludefrom))
 				continue
@@ -60,13 +56,15 @@ var/list/uplink_items = list()
 	var/abstract = 0
 	var/list/excludefrom = list() //Empty list does nothing. Place the name of gamemode you don't want this item to be available in here.
 	var/list/job = null
-	var/list/roles = null
+	var/requires_role = null
 	var/only_on_month	//two-digit month as string
 	var/only_on_day		//two-digit day as string
 	var/num_in_stock = 0	// Number of times this can be bought, globally. 0 is infinite
 	var/static/times_bought = 0
+
 	var/refundable = FALSE
-	var/refund_amount // specified refund amount in case there needs to be a TC penalty for refunds.
+	var/refund_path = null // Alternative path for refunds, in case the item purchased isn't what is actually refunded (ie: box with things).
+	var/refund_amount = null	// specified refund amount in case there needs to be a TC penalty for refunds.
 
 
 /datum/uplink_item/proc/spawn_item(var/turf/loc, var/obj/item/device/uplink/U, mob/user)
@@ -75,31 +73,29 @@ var/list/uplink_items = list()
 	return new item(loc,user)
 
 /datum/uplink_item/proc/buy(var/obj/item/device/uplink/hidden/U, var/mob/user)
-
-
 	..()
 	if(!istype(U))
-		return 0
+		return FALSE
 
-	if (user.stat || user.restrained())
-		return 0
+	if(user.stat || user.restrained())
+		return FALSE
 
-	if (!( istype(user, /mob/living/carbon/human)))
-		return 0
+	if(!(istype(user, /mob/living/carbon/human)))
+		return FALSE
 
 	if(num_in_stock && times_bought >= num_in_stock)
 		to_chat(user, "<span class='warning'>This item is out of stock.</span>")
-		return 0
+		return FALSE
 
 	// If the uplink's holder is in the user's contents
-	if ((U.loc in user.contents || (in_range(U.loc, user) && istype(U.loc.loc, /turf))))
+	if((U.loc in user.contents || (in_range(U.loc, user) && istype(U.loc.loc, /turf))))
 		user.set_machine(U)
 		if(cost > U.uses)
-			return 0
+			return FALSE
 
 		var/obj/I = spawn_item(get_turf(user), U, user)
 		if(!I)
-			return 0
+			return FALSE
 		on_item_spawned(I,user)
 		var/icon/tempimage = icon(I.icon, I.icon_state)
 		end_icons += tempimage
@@ -125,8 +121,8 @@ var/list/uplink_items = list()
 				user.mind.spent_TC += cost
 		U.interact(user)
 
-		return 1
-	return 0
+		return TRUE
+	return FALSE
 
 /datum/uplink_item/proc/on_item_spawned(var/obj/I, var/mob/user)
 	return
@@ -445,36 +441,67 @@ var/list/uplink_items = list()
 
 
 //Nuke Ops Prices
-/datum/uplink_item/nukeprice
-	roles = list(NUKE_OP)
+/datum/uplink_item/nuke
+	category = "Nuclear Operation"
+	requires_role = NUKE_OP
 
-/datum/uplink_item/nukeprice/crossbow
+/datum/uplink_item/nuke/crossbow
 	name = "Energy Crossbow"
 	desc = "A miniature energy crossbow that is small enough both to fit into a pocket and to slip into a backpack unnoticed by observers. Fires bolts tipped with an organic, poisonous substance. Stuns enemies for a short period of time. Recharges on its own."
-	category = "Highly Visible and Dangerous Weapons"
 	item = /obj/item/weapon/gun/energy/crossbow
 	cost = 10
 
-/datum/uplink_item/nukeprice/voice_changer
+/datum/uplink_item/nuke/voice_changer
 	name = "Voice Changer"
 	desc = "A conspicuous gas mask that mimics the voice named on your identification card. When no identification is worn, the mask will render your voice distinguishably unrecognizable."
-	category = "Stealth and Camouflage Items"
 	item = /obj/item/clothing/mask/gas/voice
 	cost = 8
 
-/datum/uplink_item/nukeprice/syndigaloshes
+/datum/uplink_item/nuke/syndigaloshes
 	name = "No-Slip Syndicate Shoes"
 	desc = "Allows you to run on wet floors. They do not work on lubricated surfaces and are distinguishable by their extra grip when examined closely."
-	category = "Stealth and Camouflage Items"
 	item = /obj/item/clothing/shoes/syndigaloshes
 	cost = 4
 
-/datum/uplink_item/nukeprice/chameleon_jumpsuit
+/datum/uplink_item/nuke/chameleon_jumpsuit
 	name = "Chameleon Jumpsuit"
 	desc = "A jumpsuit used to imitate the uniforms of Nanotrasen crewmembers. When caught in an EMP blast, will become psychedelic and unchangeable. When interacted with by another jumpsuit, will scan and add its appearance."
-	category = "Stealth and Camouflage Items"
 	item = /obj/item/clothing/under/chameleon
 	cost = 6
+
+/datum/uplink_item/nuke/popout_cake
+	name = "Pop-Out Cake"
+	desc = "A massive and delicious cake, big enough to store a person inside. It's equipped with a one-use party horn and special effects, and can be cut into edible slices in case of an emergency."
+	item = /obj/structure/popout_cake
+	cost = 6
+
+/datum/uplink_item/nuke/teleporter
+	name = "Teleporter Circuit Board"
+	desc = "A printed circuit board that completes the teleporter onboard the mothership. It is advised to test fire the teleporter before entering it, as malfunctions can occur."
+	item = /obj/item/weapon/circuitboard/teleporter
+	cost = 40
+
+/datum/uplink_item/nuke/gatling
+	name = "Gatling Gun"
+	desc = "A huge minigun. Makes up for its lack of mobility and discretion with sheer firepower. Has 200 bullets."
+	item = /obj/item/weapon/gun/gatling
+	cost = 40
+
+/datum/uplink_item/nuke/robot
+	name = "Syndicate Robot Teleporter"
+	desc = "A single-use teleporter used to deploy a syndicate robot that will help with your mission. Keep in mind that unlike NT cyborgs/androids these don't have access to most of the station's machinery."
+	item = /obj/item/weapon/robot_spawner/syndicate
+	cost = 40
+	refundable = TRUE
+
+/datum/uplink_item/nuke/transfer_valve
+	name = "Modified Tank Transfer Valve"
+	desc = "Refund one of these to get back 15 TC."
+	item = /obj/effect/spawner/newbomb
+	refund_path = /obj/item/device/transfer_valve/mediumsize
+	cost = 150
+	refundable = TRUE
+	refund_amount = 15
 
 // DANGEROUS WEAPONS
 
@@ -529,13 +556,6 @@ var/list/uplink_items = list()
 	desc = "A butterfly knife containing a deadly viscerator. It can be flipped to conceal the blade and deploy a stored viscerator. The viscerator will self destruct after 20 seconds but the knife will renew it's storage every 25 seconds automatically."
 	item = /obj/item/weapon/butterflyknife/viscerator
 	cost = 7
-
-/datum/uplink_item/dangerous/gatling
-	name = "Gatling Gun"
-	desc = "A huge minigun. Makes up for its lack of mobility and discretion with sheer firepower. Has 200 bullets."
-	item = /obj/item/weapon/gun/gatling
-	cost = 40
-	roles = list(NUKE_OP)
 
 // STEALTHY WEAPONS
 
@@ -725,34 +745,12 @@ var/list/uplink_items = list()
 	item = /obj/item/weapon/pinpointer/pdapinpointer
 	cost = 4
 
-/datum/uplink_item/device_tools/teleporter
-	name = "Teleporter Circuit Board"
-	desc = "A printed circuit board that completes the teleporter onboard the mothership. It is advised to test fire the teleporter before entering it, as malfunctions can occur."
-	item = /obj/item/weapon/circuitboard/teleporter
-	cost = 40
-	roles = list(NUKE_OP)
-
-/datum/uplink_item/device_tools/popout_cake
-	name = "Pop-Out Cake"
-	desc = "A massive and delicious cake, big enough to store a person inside. It's equipped with a one-use party horn and special effects, and can be cut into edible slices in case of an emergency."
-	item = /obj/structure/popout_cake
-	cost = 6
-	roles = list(NUKE_OP)
-
 /datum/uplink_item/device_tools/does_not_tip_note
 	name = "\"Does Not Tip\" database backdoor"
 	desc = "Lets you add or remove your station to the \"does not tip\" list kept by the cargo workers at Central Command. You can be sure all pizza orders will be poisoned from the moment the screen flashes red."
 	item = /obj/item/device/does_not_tip_backdoor
 	num_in_stock = 1
 	cost = 10
-
-/datum/uplink_item/dangerous/robot
-	name = "Syndicate Robot Teleporter"
-	desc = "A single-use teleporter used to deploy a syndicate robot that will help with your mission. Keep in mind that unlike NT cyborgs/androids these don't have access to most of the station's machinery."
-	item = /obj/item/weapon/robot_spawner/syndicate
-	cost = 28
-	roles = list(NUKE_OP)
-	refundable = TRUE
 
 // IMPLANTS
 
