@@ -12,8 +12,6 @@
 	return head_state
 
 /mob/living/silicon/robot/mommi/is_in_modules(obj/item/W, var/permit_sheets=0)
-	if(istype(W, src.module.emag.type))
-		return src.module.emag
 	// Exact matching for stacks (so we can load machines)
 	if(istype(W, /obj/item/stack/sheet))
 		for(var/obj/item/stack/sheet/S in src.module.modules)
@@ -118,7 +116,7 @@
 	if(stat != CONSCIOUS || !isturf(loc))
 		return
 
-	if((module_active in src.contents) && !(module_active in src.module.modules) && (module_active != src.module.emag) && candrop)
+	if((module_active in src.contents) && !(module_active in src.module.modules) && candrop)
 		TS = tool_state
 		drop_item(TS)
 	if(tool_state == module_active)

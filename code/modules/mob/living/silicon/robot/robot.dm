@@ -1230,12 +1230,8 @@ var/list/cyborg_list = list()
 
 /mob/living/silicon/robot/proc/SetEmagged(var/new_state)
 	emagged = new_state
-	if(new_state || illegal_weapons)
-		if(module)
-			module.on_emag()
-	else
-		if(module)
-			uneq_module(module.emag)
+	if(module)
+		module.rebuild()
 	if(hud_used)
 		hud_used.update_robot_modules_display()
 	update_icons()

@@ -56,7 +56,7 @@ var/global/list/all_robot_modules = default_nanotrasen_robot_modules + emergency
 
 
 //Module quirks
-#define MODULE_CAN_BE_PUSHED 1			//What says on the tin.
+#define MODULE_CAN_NOT_BE_PUSHED 1			//What says on the tin.
 #define MODULE_CAN_HANDLE_MEDICAL 2		//Can use medbay's machinery
 #define MODULE_CAN_HANDLE_CHEMS 4		//Can use chemistry dispensers
 #define MODULE_CAN_HANDLE_FOOD 8		//Can use microwaves and bartending machinery

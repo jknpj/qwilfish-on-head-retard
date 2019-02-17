@@ -1,50 +1,45 @@
 
 /obj/item/weapon/robot_module/mommi
 	name = "mobile mmi robot module"
-	quirk_flags = MODULE_CAN_BE_PUSHED | MODULE_HAS_MAGPULSE | MODULE_CAN_HANDLE_CHEMS | MODULE_CAN_BUY
+	quirk_flags = MODULE_HAS_MAGPULSE | MODULE_CAN_HANDLE_CHEMS | MODULE_CAN_BUY
 	languages = list()
 	sprites = list("Basic" = "mommi")
-	respawnables = list (/obj/item/stack/cable_coil)
+	default_modules = list()
+	main_modules = list(
+		/obj/item/weapon/weldingtool/largetank,
+		/obj/item/weapon/screwdriver,
+		/obj/item/weapon/wrench,
+		/obj/item/weapon/crowbar,
+		/obj/item/weapon/wirecutters,
+		/obj/item/device/multitool,
+		/obj/item/device/t_scanner,
+		/obj/item/device/analyzer,
+		/obj/item/weapon/extinguisher,
+		/obj/item/weapon/extinguisher/foam,
+		/obj/item/device/rcd/rpd,
+		/obj/item/device/rcd/tile_painter,
+		/obj/item/blueprints/mommiprints,
+		/obj/item/device/material_synth/robot/mommi,
+		/obj/item/device/holomap,
+		/obj/item/device/station_map,
+		/obj/item/device/silicate_sprayer,
+		/obj/item/borg/fire_shield
+		)
+	syndicate_modules = list(
+		/obj/item/borg/stun
+		)
+	respawnables = list (
+		/obj/item/stack/cable_coil
+		)
 	respawnables_max_amount = MOMMI_MAX_COIL
-	default_modules = FALSE
+	sensor_augs = list("Mesons", "Disable")
 	var/ae_type = "Default" //Anti-emancipation override type, pretty much just fluffy.
 	var/law_type = "Default"
-
-/obj/item/weapon/robot_module/mommi/New(var/mob/living/silicon/robot/R)
-	..()
-
-	modules += new /obj/item/weapon/weldingtool/largetank(src)
-	modules += new /obj/item/weapon/screwdriver(src)
-	modules += new /obj/item/weapon/wrench(src)
-	modules += new /obj/item/weapon/crowbar(src)
-	modules += new /obj/item/weapon/wirecutters(src)
-	modules += new /obj/item/device/multitool(src)
-	modules += new /obj/item/device/t_scanner(src)
-	modules += new /obj/item/device/analyzer(src)
-	modules += new /obj/item/weapon/extinguisher(src)
-	modules += new /obj/item/weapon/extinguisher/foam(src)
-	modules += new /obj/item/device/rcd/rpd(src)
-	modules += new /obj/item/device/rcd/tile_painter(src)
-	modules += new /obj/item/blueprints/mommiprints(src)
-	modules += new /obj/item/device/material_synth/robot/mommi(src)
-	modules += new /obj/item/device/holomap(src)
-	modules += new /obj/item/device/station_map(src)
-	modules += new /obj/item/device/silicate_sprayer(src)
-	modules += new /obj/item/borg/fire_shield
-
-	var/obj/item/stack/cable_coil/W = new /obj/item/stack/cable_coil(src)
-	W.amount = MOMMI_MAX_COIL
-	W.max_amount = MOMMI_MAX_COIL
-	modules += W
-	emag = new /obj/item/borg/stun(src)
-
-	sensor_augs = list("Mesons", "Disable")
-
-	fix_modules()
 
 //Nanotrasen's MoMMI
 /obj/item/weapon/robot_module/mommi/nt
 	name = "nanotrasen mobile mmi robot module"
+	speed_modifier = MOMMI_NT_SPEED_MODIFIER
 	networks = list(CAMERANET_ENGI)
 	radio_key = /obj/item/device/encryptionkey/headset_eng
 	ae_type = "Nanotrasen patented"
@@ -57,28 +52,24 @@
 		"RepairBot" = "repairbot",
 		"Hover" = "hovermommi"
 		)
-	speed_modifier = MOMMI_NT_SPEED_MODIFIER
 
 //Derelict MoMMI
 /obj/item/weapon/robot_module/mommi/soviet
 	name = "russian remont robot module"
-	ae_type = "Начато отмену"
 	speed_modifier = MOMMI_SOVIET_SPEED_MODIFIER
+	quirk_flags = MODULE_HAS_MAGPULSE | MODULE_CAN_HANDLE_CHEMS | MODULE_CAN_BUY | MODULE_CAN_HANDLE_FOOD
 	sprites = list(
 		"RuskieBot" = "ruskiebot"
 		)
-
-/obj/item/weapon/robot_module/mommi/soviet/New(var/mob/living/silicon/robot/R) //Powercreep!
-	..()
-
-	quirk_flags |= MODULE_CAN_HANDLE_FOOD //Let them be able to handle bartending machinery.
-
-	modules += new /obj/item/device/rcd/borg/engineering(src)
-	modules += new /obj/item/device/instrument/instrument_synth(src)
-	modules += new /obj/item/device/rcd/borg/rsf/soviet(src)
-	modules += new /obj/item/weapon/soap/syndie(src)
-	modules += new /obj/item/weapon/pickaxe/plasmacutter(src)
-	modules += new /obj/item/weapon/storage/bag/ore/auto(src)
+	default_modules = list(
+		/obj/item/device/rcd/borg/engineering,
+		/obj/item/device/instrument/instrument_synth,
+		/obj/item/device/rcd/borg/rsf/soviet,
+		/obj/item/weapon/soap/syndie,
+		/obj/item/weapon/pickaxe/plasmacutter,
+		/obj/item/weapon/storage/bag/ore/auto
+		)
+	ae_type = "Начато отмену"
 
 /obj/item/weapon/robot_module/mommi/cogspider
 	name = "Gravekeeper belt of holding."
@@ -86,4 +77,5 @@
 	sprites = list(
 		"Gravekeeper" = "cogspider"
 		)
+	ae_type = "Clockwork"
 	law_type = "Gravekeeper"

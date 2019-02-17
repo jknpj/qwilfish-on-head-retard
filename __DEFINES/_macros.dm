@@ -279,6 +279,8 @@
 
 #define isERT(H) (H.mind && H.mind.GetRole(RESPONDER))
 
+#define isgravekeeper(H) (H.mind && H.mind.GetRole(CLOCKWORK_GRAVEKEEPER))
+
 //Banning someone from the Syndicate role bans them from all antagonist roles
 #define isantagbanned(H) (jobban_isbanned(H, "Syndicate"))
 

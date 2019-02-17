@@ -260,11 +260,6 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 			dat += text("[obj]: <B>Activated</B><BR>")
 		else
 			dat += text("[obj]: <A HREF=?src=\ref[src];act=\ref[obj]>Activate</A><BR>")
-	if(emagged)
-		if(activated(module.emag))
-			dat += text("[module.emag]: <B>Activated</B><BR>")
-		else
-			dat += text("[module.emag]: <A HREF=?src=\ref[src];act=\ref[module.emag]>Activate</A><BR>")
 	src << browse(dat, "window=robotmod&can_close=1")
 	onclose(src,"robotmod") // Register on-close shit, which unsets machinery.
 
@@ -292,7 +287,7 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 	if(href_list["act"])
 		var/obj/item/O = locate(href_list["act"])
 		var/obj/item/TS
-		if(!(locate(O) in module.modules) && O != module.emag)
+		if(!(locate(O) in module.modules))
 			return
 		TS = tool_state
 		if(tool_state)
