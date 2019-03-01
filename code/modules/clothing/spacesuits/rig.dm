@@ -679,3 +679,51 @@
 
 /obj/item/clothing/head/helmet/space/rig/ror/update_icon()
 	return
+
+/obj/item/clothing/head/helmet/space/rig/sundowner
+	name = "syndicate custom hardsuit - 'sundowner'"
+	desc = "A custom-built syndicate hardsuit designed to enhance the power of high-frequency weaponry. Named after the hot, dry winds of California."
+	icon_state = "sundowner_suit"
+	item_state = "sundowner_suit"
+	armor = list(melee = 70, bullet = 0, laser = 70, energy = 0, bomb = 100, bio = 100, rad = 0)
+	allowed = list(/obj/item/weapon/tank, /obj/item/weapon/melee/energy/hfmachete)
+	actions_types = list(/datum/action/item_action/toggle_rig_helmet, /datum/action/item_action/toggle_rig_boots)
+	head_type = /obj/item/clothing/head/helmet/space/rig/ror
+	var/obj/item/clothing/shoes/S = null
+	var/shoes_type = /obj/item/clothing/shoes/magboots/sundowner
+
+/obj/item/clothing/suit/space/rig/sundowner/attackby(obj/W, mob/user)
+	if(!S && istype(W, shoes_type) && user.drop_item(W, src, force_drop = TRUE))
+		to_chat(user, "<span class = 'notice'>You attach \the [W] to \the [src].</span>")
+		S = W
+		return
+	..()
+
+/obj/item/clothing/suit/space/rig/sundowner/New()
+	..()
+	S = new shoes_type
+
+/obj/item/clothing/suit/space/rig/sundowner/Destroy()
+	..()
+	if(S.loc == src || !S.loc)
+		qdel(S)
+	S = null
+
+/obj/item/clothing/suit/space/rig/proc/toggle_boots(mob/living/carbon/human/user)
+	if(!user.is_wearing_item(src, slot_wear_suit))
+		return
+	if(S)
+		if(!user.shoes)
+			to_chat(user, "<span class = 'notice'>\The [H] extends from \the [src].</span>")
+			user.equip_to_slot(S, slot_shoes)
+			S.rig = src
+			S = null
+			initialize_suit(user)
+	else
+		if(user.shoes && istype(user.shoes, shoes_type))
+			var/obj/I = user.shoes
+			to_chat(user, "<span class = 'notice'\The [I] retracts into \the [src].</span>")
+			user.u_equip(I,0)
+			I.forceMove(src)
+			S = I
+			deactivate_suit(user)

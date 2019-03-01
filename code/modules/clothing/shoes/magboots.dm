@@ -211,3 +211,13 @@
 	canremove = 1
 	clothing_flags &= ~NOSLIP
 	magpulse = 0
+
+//Sundowner
+/obj/item/clothing/shoes/magboots/sundowner
+	name = "syndicate custom magboots"
+	esc = "A custom-built pair of magboots. Has a built-in computer that balances its magnetic traction and anchoring spike power to reduce the leg stress."
+	icon_state = "sundowner_boots1"
+	base_state = "sundowner_boots"
+	anchoring_system_examine = "Its anchoring spike and mag-pulse traction appear to be"
+	mag_slow = MAGBOOTS_SLOWDOWN_MED
+	stomp_attack_power = 50

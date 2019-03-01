@@ -224,6 +224,16 @@
 		return TRUE
 	return FALSE
 
+/datum/action/item_action/toggle_rig_boots
+	name = "Toggle rig boots"
+
+/datum/action/item_action/toggle_rig_boots/Trigger()
+	if(IsAvailable() && owner && target && istype(target,/obj/item/clothing/suit/space/rig))
+		var/obj/item/clothing/suit/space/rig/R = target
+		R.toggle_boots(owner)
+		return TRUE
+	return FALSE
+
 /datum/action/item_action/toggle_rig_light
 	name = "Toggle rig light"
 
