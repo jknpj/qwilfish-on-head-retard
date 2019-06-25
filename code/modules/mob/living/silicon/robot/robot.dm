@@ -1359,3 +1359,50 @@ var/list/cyborg_list = list()
 /mob/living/silicon/robot/proc/toggle_modulelock()
 	modulelock = !modulelock
 	return modulelock
+
+/mob/living/silicon/robot/proc/swap_cell(var/mob/user, var/obj/item/weapon/cell/new_cell)
+	if(!new_cell)
+		return FALSE
+	var/datum/robot_component/cell_component = components["power cell"]
+	var/obj/item/weapon/cell/old_cell = cell
+	if(cell)
+		if(user)
+			to_chat(user, "You swap \the [cell.name] within with \the [new_cell.name] in your hand.")
+			user.drop_item(new_cell, src)
+			user.put_in_hands(old_cell)
+		else
+			new_cell.forceMove(src)
+			old_cell.forceMove(get_turf(src))
+		if(can_diagnose())
+			to_chat(src, "<span class='info' style=\"font-family:Courier\">Cell removed.</span>")
+		old_cell.electronics_damage = cell_component.electronics_damage
+		old_cell.brute_damage = cell_component.brute_damage
+		cell_component.wrapped = null
+		cell_component.installed = COMPONENT_MISSING
+
+		cell = new_cell
+		cell_component.electronics_damage = cell.electronics_damage
+		cell_component.brute_damage = cell.brute_damage
+		cell_component.wrapped = new_cell
+		cell_component.installed = COMPONENT_INSTALLED
+		cell_component.install()
+		if(can_diagnose())
+			to_chat(src, "<span class='info' style=\"font-family:Courier\">New cell installed. Type: [cell.name]. Charge: [cell.charge].</span>")
+
+	else
+		if(user)
+			user.drop_item(new_cell, src)
+			to_chat(user, "You insert the power cell.")
+		else
+			new_cell.forceMove(src)
+		
+		cell = new_cell
+		cell_component.electronics_damage = cell.electronics_damage
+		cell_component.brute_damage = cell.brute_damage
+		cell_component.wrapped = new_cell
+		cell_component.installed = COMPONENT_INSTALLED
+		cell_component.install()
+		if(can_diagnose())
+			to_chat(src, "<span class='info' style=\"font-family:Courier\">New cell installed. Type: [cell.name]. Charge: [cell.charge].</span>")
+	updateicon()
+	return TRUE

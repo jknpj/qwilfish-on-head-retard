@@ -87,6 +87,11 @@
 	my_appearance.h_style = "Bald"
 	regenerate_icons()
 
+/mob/living/carbon/human/android/New(var/new_loc, delay_ready_dna = 0)
+	..(new_loc, "Android")
+	my_appearance.h_style = "Bald"
+	regenerate_icons()
+
 /mob/living/carbon/human/NPC/New(var/new_loc, delay_ready_dna = 0)
 	..(new_loc)
 	initialize_basic_NPC_components()

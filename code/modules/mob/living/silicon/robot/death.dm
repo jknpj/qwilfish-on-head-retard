@@ -54,7 +54,7 @@
 		var/obj/machinery/recharge_station/RC = loc
 		if(RC.upgrading)
 			RC.upgrading = FALSE
-			RC.upgrade_finished = -1 //WHY
+			RC.upgrade_finish_time = -1 //WHY
 		RC.go_out()
 
 	handle_sensor_modes()
