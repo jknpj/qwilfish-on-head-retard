@@ -44,7 +44,7 @@
 			..(newturf,user,params,reflex,struggle)
 
 /obj/item/weapon/gun/gatling/update_wield(mob/user)
-	item_state = "minigun[wielded ? 1 : 0]"
+	item_state = "initial(icon_state)[wielded ? 1 : 0]"
 	if(wielded)
 		slowdown = MINIGUN_SLOWDOWN_WIELDED
 	else

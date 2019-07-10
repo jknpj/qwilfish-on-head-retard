@@ -320,6 +320,27 @@
 	damage = 30
 	fire_sound = 'sound/weapons/gatling_fire.ogg'
 
+/obj/item/projectile/bullet/gatling/baton
+	name = "high-speed stun baton"
+	icon = 'icons/obj/weapons.dmi'
+	icon_state = "stun baton"
+	damage = 20
+	var/obj/shotloc = null //Where the baton was shot from (stored to  be retrieved when the projectile dies)
+
+/obj/item/projectile/bullet/gatling/baton/OnFired()
+	shotloc = get_turf(shot_from)
+	..()
+
+/obj/item/projectile/bullet/gatling/baton/to_bump(atom/A)
+	if(loc)
+		var/newloc = get_step(src.loc, get_dir(src.loc, shotloc)) //basically puts it back one tile in its movement
+		var/obj/item/weapon/melee/baton/loaded/newbaton = new(newloc)
+		if(ismob(A))
+			newbaton.throw_impact(A)
+		qdel(src)
+
+	return ..()
+
 /obj/item/projectile/bullet/osipr
 	name = "\improper OSIPR bullet"
 	icon = 'icons/obj/projectiles_experimental.dmi'
