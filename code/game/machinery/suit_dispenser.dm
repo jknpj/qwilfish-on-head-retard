@@ -207,23 +207,20 @@ var/list/dispenser_presets = list()
 						return
 					preset.name = preset_name
 					dispenser_presets[preset_name] = preset
-					one_suit = preset
-					icon_state = "suitdispenser"
-					flick("suitdispenser-fill",src)
-					one_suit.amount = promptfornum(user)
+					to_chat(user,"<span class='notice'>Preset saved!</span>")
 
 			if("Choose a Preset")
 				if (!dispenser_presets.len)
 					to_chat(user,"<span class='warning'>Error. No presets have been set. Place items on top of the dispenser to define them as presets.</span>")
 					return
-				var/datum/suit/custom/preset = input(user,"Choose a Preset.", "Suit Dispenser") in dispenser_presets
-				if (preset && !one_suit)
-					icon_state = "suitdispenser"
-					flick("suitdispenser-fill",src)
+				var/chosen = input(user,"Choose a Preset.", "Suit Dispenser") in dispenser_presets
+				var/datum/suit/custom/preset = dispenser_presets[chosen]
 				one_suit = new /datum/suit/custom
 				one_suit.name = preset.name
 				one_suit.to_spawn = preset.to_spawn
 				one_suit.amount = promptfornum(user)
+				icon_state = "suitdispenser"
+				flick("suitdispenser-fill",src)
 
 
 			if("Resupply")
@@ -268,7 +265,7 @@ var/list/dispenser_presets = list()
 
 /datum/suit/dorf/head/captain
 	name = "Captain"
-	to_spawn = (/obj/item/clothing/suit/armor/captain,/obj/item/clothing/head/helmet/space/capspace)
+	to_spawn = (/obj/item/clothing/suit/space/rig/captain,/obj/item/clothing/head/helmet/space/rig/capspace)
 
 /datum/suit/dorf/head/chiefengie
 	name = "Chief Engineer"

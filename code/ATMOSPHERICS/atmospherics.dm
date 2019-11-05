@@ -154,6 +154,8 @@ Pipelines + Other Objects -> Pipe network
 		update_icon_ready = 1
 	else
 		underlays.Cut()
+	if(!anchored)
+		return //the rest isn't needed for unanchored things
 	var/list/missing_nodes = icon_directions()
 	for (var/obj/machinery/atmospherics/connected_node in node_list)
 		var/con_dir = get_dir(src, connected_node)
@@ -213,7 +215,7 @@ Pipelines + Other Objects -> Pipe network
 //Called when checking connectability in findConnecting()
 //This is checked for both pipes in establishing a connection - the base behaviour will work fine nearly every time
 /obj/machinery/atmospherics/proc/isConnectable(var/obj/machinery/atmospherics/target, var/direction, var/given_layer)
-	return (target.piping_layer == given_layer || target.pipe_flags & ALL_LAYER)
+	return (target.get_layer_of_dir(turn(direction, 180)) == given_layer || target.pipe_flags & ALL_LAYER)
 
 /obj/machinery/atmospherics/proc/getNodeType(var/node_id)
 	return PIPE_TYPE_STANDARD
@@ -239,7 +241,7 @@ Pipelines + Other Objects -> Pipe network
 				continue
 			var/node_var="node[node_id]"
 			if(!(node_var in vars))
-				testing("[node_var] not in vars.")
+				//testing("[node_var] not in vars.")
 				return
 			if(!vars[node_var])
 				vars[node_var] = found
@@ -276,7 +278,7 @@ Pipelines + Other Objects -> Pipe network
 /obj/machinery/atmospherics/proc/reassign_network(datum/pipe_network/old_network, datum/pipe_network/new_network)
 	// Used when two pipe_networks are combining
 
-/obj/machinery/atmospherics/proc/return_network_air(datum/network/reference)
+/obj/machinery/atmospherics/proc/return_network_air(datum/pipe_network/reference)
 	// Return a list of gas_mixture(s) in the object
 	//		associated with reference pipe_network for use in rebuilding the networks gases list
 	// Is permitted to return null
@@ -289,7 +291,9 @@ Pipelines + Other Objects -> Pipe network
 	return FALSE
 
 /obj/machinery/atmospherics/cultify()
-	if(src.invisibility != INVISIBILITY_MAXIMUM)
+	if(density)
+		..()
+	else
 		src.invisibility = INVISIBILITY_MAXIMUM
 
 
@@ -376,7 +380,7 @@ Pipelines + Other Objects -> Pipe network
 	else
 		if((direction & initialize_directions) || is_type_in_list(src, ventcrawl_machinery) && src.can_crawl_through()) //if we move in a way the pipe can connect, but doesn't - or we're in a vent
 			user.remove_ventcrawl()
-			user.forceMove(src.loc)
+			user.forceMove(src.loc, glide_size_override = DELAY2GLIDESIZE(1))
 			user.visible_message("You hear something squeezing through the pipes.", "You climb out the ventilation system.")
 	user.canmove = 0
 	spawn(1)
@@ -396,3 +400,8 @@ Pipelines + Other Objects -> Pipe network
 
 	var/turf/T = loc
 	return !T.intact
+
+// Returns the layer of a pipe connection in the specified direction
+// Only needs to be overridden if a pipe can connect on different layers
+/obj/machinery/atmospherics/proc/get_layer_of_dir(var/direction)
+	return piping_layer

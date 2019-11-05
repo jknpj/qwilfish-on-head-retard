@@ -8,6 +8,7 @@
 	anchored = 1
 	circuit = "/obj/item/weapon/circuitboard/smeltcomp"
 	light_color = LIGHT_COLOR_GREEN
+	req_access = list(access_mining)
 
 	var/frequency = FREQ_DISPOSAL //Same as conveyors.
 	var/smelter_tag = null
@@ -83,7 +84,7 @@
 
 	else if(id)	//I don't care but the ID got in there in some way, allow them to eject it atleast.
 		dat += "<br><A href='?src=\ref[src];eject=1'>Eject ID.</A>"
-	
+
 	dat += {"</div>
 	<div style="float:left;" class="block">
 	<table>
@@ -182,6 +183,10 @@
 
 		if(id)
 			to_chat(usr, "<span class='notify'>There is already an ID in the console!</span>")
+			return 1
+
+		if(!allowed(usr))
+			to_chat(usr, "<span class='warning'>The machine rejects your access credentials.</span>")
 			return 1
 
 		var/obj/item/weapon/card/id/I = usr.get_active_hand()
@@ -394,23 +399,23 @@
 		if(sheets_this_tick >= sheets_per_tick)
 			break
 
-		if(!istype(A, /obj/item/weapon/ore))//Check if it's an ore
+		if(!istype(A, /obj/item/stack/ore))//Check if it's an ore
 			A.forceMove(out_T)
 			continue
 
-		var/obj/item/weapon/ore/O = A
+		var/obj/item/stack/ore/O = A
 		if(!O.material)
 			continue
 
-		ore.addAmount(O.material, 1)//1 per ore
+		ore.addAmount(O.material, O.amount)
 
 		var/datum/material/mat = ore.getMaterial(O.material)
 		if(!mat)
 			continue
 
-		credits += mat.value //Dosh.
+		credits += mat.value*O.amount //Dosh.
 
-		qdel(O)
+		returnToPool(O)
 
 /obj/machinery/mineral/processing_unit/process()
 	if(stat & (NOPOWER | BROKEN))
@@ -437,7 +442,7 @@
 				ore.removeAmount(ore_id, 1)
 				score["oremined"] += 1 //Count this ore piece as processed for the scoreboard
 
-			getFromPool(R.yieldtype, out_T)
+			drop_stack(R.yieldtype, out_T)
 
 			sheets_this_tick++
 			if(sheets_this_tick >= sheets_per_tick)
@@ -473,11 +478,11 @@
 			credits = 0
 
 	if(signal.data["inc_priority"])
-		var/idx = Clamp(signal.data["inc_priority"], 2, recipes.len)
+		var/idx = clamp(signal.data["inc_priority"], 2, recipes.len)
 		recipes.Swap(idx, idx - 1)
 
 	if(signal.data["dec_priority"])
-		var/idx = Clamp(signal.data["dec_priority"], 1, recipes.len - 1)
+		var/idx = clamp(signal.data["dec_priority"], 1, recipes.len - 1)
 		recipes.Swap(idx, idx + 1)
 
 /obj/machinery/mineral/processing_unit/multitool_menu(var/mob/user, var/obj/item/device/multitool/P)
@@ -495,7 +500,7 @@
 /obj/machinery/mineral/processing_unit/multitool_topic(mob/user, list/href_list, obj/item/device/multitool/P)
 	if("changedir" in href_list)
 		var/changingdir = text2num(href_list["changedir"])
-		changingdir = Clamp(changingdir, 1, 2)//No runtimes from HREF exploits.
+		changingdir = clamp(changingdir, 1, 2)//No runtimes from HREF exploits.
 
 		var/newdir = input("Select the new direction", name, "North") as null|anything in list("North", "South", "East", "West")
 		if(!newdir)

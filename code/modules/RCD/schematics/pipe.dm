@@ -327,7 +327,7 @@
 		return 1
 
 	if(href_list["set_layer"] && layer) //Only handle this is layer is nonzero.
-		var/n_layer = Clamp(round(text2num(href_list["set_layer"])), PIPING_LAYER_MIN, PIPING_LAYER_MAX)
+		var/n_layer = clamp(round(text2num(href_list["set_layer"])), PIPING_LAYER_MIN, PIPING_LAYER_MAX)
 		if(layer == n_layer) //No point doing anything.
 			return 1
 
@@ -419,13 +419,14 @@
 /datum/rcd_schematic/pipe/disposal/attack(var/atom/A, var/mob/user)
 	to_chat(user, "Building Pipes ...")
 	playsound(user, 'sound/machines/click.ogg', 50, 1)
+	var/thisdir = selected_dir
 	if(!master.delay(user, A, 2 SECONDS))
 		return 1
 
 	playsound(user, 'sound/items/Deconstruct.ogg', 50, 1)
 
 	var/obj/structure/disposalconstruct/C = new/obj/structure/disposalconstruct(A)
-	C.dir	= selected_dir
+	C.dir	= thisdir
 	C.ptype	= actual_id
 	C.update()
 

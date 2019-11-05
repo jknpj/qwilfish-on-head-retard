@@ -15,7 +15,7 @@
 
 /obj/item/weapon/retractor/suicide_act(mob/user)
 	to_chat(viewers(user), "<span class='danger'>[user] is pulling \his eyes out with the [src.name]! It looks like \he's  trying to commit suicide!</span>")
-	return (BRUTELOSS)
+	return (SUICIDE_ACT_BRUTELOSS)
 
 /obj/item/weapon/retractor/manager
 	name = "surgical incision manager"
@@ -57,7 +57,7 @@
 
 /obj/item/weapon/hemostat/suicide_act(mob/user)
 	to_chat(viewers(user), "<span class='danger'>[user] is pulling \his eyes out with the [src.name]! It looks like \he's  trying to commit suicide!</span>")
-	return (BRUTELOSS)
+	return (SUICIDE_ACT_BRUTELOSS)
 
 
 /obj/item/weapon/cautery
@@ -80,7 +80,7 @@
 
 /obj/item/weapon/cautery/suicide_act(mob/user)
 	to_chat(viewers(user), "<span class='danger'>[user] is burning \his eyes out with the [src.name]! It looks like \he's  trying to commit suicide!</span>")
-	return (BRUTELOSS)
+	return (SUICIDE_ACT_BRUTELOSS)
 
 
 /obj/item/weapon/cautery/laser
@@ -95,6 +95,7 @@
 	surgery_speed = 0.6
 	heat_production = 1500
 	source_temperature = TEMPERATURE_PLASMA
+	sterility = 100
 
 /*
 /obj/item/weapon/cautery/laser/old //unused laser cautery. For the laser scalpel
@@ -142,7 +143,7 @@
 /obj/item/weapon/surgicaldrill/suicide_act(mob/user)
 	to_chat(viewers(user), pick("<span class='danger'>[user] is pressing the [src.name] to \his temple and activating it! It looks like \he's trying to commit suicide.</span>", \
 						"<span class='danger'>[user] is pressing [src.name] to \his chest and activating it! It looks like \he's trying to commit suicide.</span>"))
-	return (BRUTELOSS)
+	return (SUICIDE_ACT_BRUTELOSS)
 
 
 /obj/item/weapon/scalpel
@@ -171,7 +172,7 @@
 	to_chat(viewers(user), pick("<span class='danger'>[user] is slitting \his wrists with the [src.name]! It looks like \he's trying to commit suicide.</span>", \
 						"<span class='danger'>[user] is slitting \his throat with the [src.name]! It looks like \he's trying to commit suicide.</span>", \
 						"<span class='danger'>[user] is slitting \his stomach open with the [src.name]! It looks like \he's trying to commit seppuku.</span>"))
-	return (BRUTELOSS)
+	return (SUICIDE_ACT_BRUTELOSS)
 
 
 /obj/item/weapon/scalpel/laser
@@ -184,6 +185,7 @@
 	damtype = "fire"
 	sharpness_flags = SHARP_TIP | SHARP_BLADE | HOT_EDGE
 	surgery_speed = 0.6
+	sterility = 100
 	var/cauterymode = 0 //1 = cautery enabled
 	var/obj/item/weapon/cautery/laser/held
 
@@ -217,7 +219,7 @@
 		to_chat(user, "\The [src] is in cautery mode.")
 
 /obj/item/weapon/scalpel/laser/attackby(var/obj/item/used_item, mob/user)
-	if(isscrewdriver(used_item) && cauterymode)
+	if(used_item.is_screwdriver(user) && cauterymode)
 		if(held)
 			to_chat(user, "<span class='notice'>You detach \the [held] and \the [src] switches to cutting mode.</span>")
 			playsound(src, "sound/items/screwdriver.ogg", 10, 1)
@@ -304,7 +306,7 @@
 
 /obj/item/weapon/circular_saw/suicide_act(mob/user)
 	to_chat(viewers(user), "<span class='danger'>[user] is sawing \his head in two with the [src.name]! It looks like \he's  trying to commit suicide!</span>")
-	return (BRUTELOSS)
+	return (SUICIDE_ACT_BRUTELOSS)
 
 
 /obj/item/weapon/bonegel
@@ -320,7 +322,7 @@
 /obj/item/weapon/bonegel/suicide_act(mob/user)
 	to_chat(viewers(user), "<span class='danger'>[user] is eating the [src.name]! It looks like \he's  trying to commit suicide!</span>")//Don't eat glue kids.
 
-	return (TOXLOSS)
+	return (SUICIDE_ACT_TOXLOSS)
 
 
 /obj/item/weapon/FixOVein
@@ -423,7 +425,7 @@
 
 /obj/item/weapon/revivalprod/attack(mob/target,mob/user)
 	if(target.lying)
-		target.sleeping = max(0,target.sleeping-5)
+		target.sleeping = max(0,target.sleeping-10)
 		if(target.sleeping == 0)
 			target.resting = 0
 		target.AdjustParalysis(-3)

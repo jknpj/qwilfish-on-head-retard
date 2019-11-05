@@ -20,6 +20,14 @@
 	ammo_type = "/obj/item/ammo_casing/c38"
 	max_ammo = 6
 	multiple_sprites = 1
+	
+/obj/item/ammo_storage/box/c762x38r
+	name = "ammo box (7.62x38R)"
+	desc = "A box of neo-russian revolver ammo."
+	icon_state = "bnagant"
+	ammo_type = "/obj/item/ammo_casing/c762x38r"
+	max_ammo = 7
+	multiple_sprites = 1
 
 /obj/item/ammo_storage/box/a418
 	name = "ammo box (.418)"
@@ -59,7 +67,7 @@
 	icon_state = "9mmred"
 	origin_tech = Tc_COMBAT + "=2"
 	ammo_type = "/obj/item/ammo_casing/c45"
-	caliber = ".45"
+	caliber = POINT45
 	max_ammo = 24
 
 /obj/item/ammo_storage/box/c45/practice
@@ -80,7 +88,7 @@
 	icon_state = "9mmred"
 	origin_tech = Tc_COMBAT + "=2"
 	ammo_type = "/obj/item/ammo_casing/c380auto"
-	caliber = ".380AUTO"
+	caliber = POINT380
 	max_ammo = 30
 
 /obj/item/ammo_storage/box/b380auto/practice
@@ -94,7 +102,7 @@
 	desc = "A box of .380AUTO rubber bullets. Holds 30 rounds."
 	icon_state = "9mmblue"
 	ammo_type = "/obj/item/ammo_casing/c380auto/rubber"
-	
+
 /obj/item/ammo_storage/box/BMG50
 	name = "ammo box (.50 BMG)"
 	icon_state = "50BMG"

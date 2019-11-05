@@ -1,5 +1,3 @@
-
-
 /datum/event/infestation
 	announceWhen = 15
 	endWhen = 20
@@ -8,6 +6,9 @@
 	var/vermin = VERM_MICE
 	var/override_location = null
 	var/override_vermin = null
+
+/datum/event/infestation/can_start()
+	return 50
 
 /datum/event/infestation/start()
 
@@ -48,14 +49,15 @@
 	var/list/spawn_types = list()
 	var/max_number = 4
 
-	vermin = pick(VERM_MICE, VERM_LIZARDS, VERM_SPIDERS, VERM_SLIMES, VERM_BATS, VERM_BORERS, VERM_MIMICS, VERM_ROACHES, VERM_GREMLINS, VERM_BEES)
+	vermin = pick(VERM_MICE, VERM_LIZARDS, VERM_SPIDERS, VERM_SLIMES, VERM_BATS, VERM_BORERS, VERM_MIMICS, VERM_ROACHES, VERM_GREMLINS, VERM_BEES, VERM_HORNETS,
+	VERM_SYPHONER, VERM_GREMTIDE, VERM_CRABS)
 
 	if (override_vermin)
 		vermin = override_vermin
 
 	switch(vermin)
 		if(VERM_MICE)
-			spawn_types = list(/mob/living/simple_animal/mouse/gray, /mob/living/simple_animal/mouse/brown, /mob/living/simple_animal/mouse/white)
+			spawn_types = list(/mob/living/simple_animal/mouse/common/gray, /mob/living/simple_animal/mouse/common/brown, /mob/living/simple_animal/mouse/common/white)
 			max_number = 12
 			vermstring = "mice"
 		if(VERM_LIZARDS)
@@ -88,9 +90,25 @@
 			vermstring = "gremlins"
 			max_number = 4 //2 to 4
 		if(VERM_BEES)
-			spawn_types = /obj/machinery/apiary/wild
+			spawn_types = /obj/machinery/apiary/wild/angry
 			vermstring = "angry bees"
 			max_number = 2
+		if(VERM_HORNETS)
+			spawn_types = /obj/machinery/apiary/wild/angry/hornet
+			vermstring = "deadly hornets"
+			max_number = 2
+		if(VERM_SYPHONER)
+			spawn_types = /mob/living/simple_animal/hostile/syphoner
+			vermstring = "rogue cell chargers"
+			max_number = 2
+		if(VERM_GREMTIDE)
+			spawn_types = /mob/living/simple_animal/hostile/gremlin/greytide
+			vermstring = "gremlin assistants"
+			max_number = 3
+		if(VERM_CRABS)
+			spawn_types = list(/mob/living/simple_animal/crab, /mob/living/simple_animal/crab/kickstool, /mob/living/simple_animal/crab/snowy)
+			vermstring = "crabs"
+			max_number = 5
 
 	var/number = rand(2, max_number)
 

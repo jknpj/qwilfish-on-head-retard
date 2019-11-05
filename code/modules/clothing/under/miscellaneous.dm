@@ -65,6 +65,13 @@
 	item_state = "sexyclown"
 	_color = "sexyclown"
 
+/obj/item/clothing/under/lola
+	name = "fighting clown suit"
+	desc = "Give 'em the ol' one-two!"
+	icon_state = "lola"
+	item_state = "lola"
+	_color = "lola"
+
 /obj/item/clothing/under/rank/vice
 	name = "vice officer's jumpsuit"
 	desc = "It's the standard issue pretty-boy outfit, as seen on Holo-Vision."
@@ -537,7 +544,7 @@
 	_color = "maid"
 
 /obj/item/clothing/under/darkholme
-	name = "\improper The Darkholme"
+	name = "\improper Darkholme"
 	desc = "Fuck you."
 	icon_state = "darkholme"
 	item_state = "darkholme"
@@ -691,7 +698,7 @@
 	icon_state = "nr_uniform"
 	item_state = "nr_uniform"
 	_color = "nr_uniform"
-
+/*
 /obj/item/clothing/under/skelevoxsuit
 	name = "skelevox suit"
 	desc = "Feels like wearing literally nothing at all!"
@@ -700,7 +707,7 @@
 	_color = "vox-skelesuit"
 	species_restricted = list(VOX_SHAPED)
 	species_fit = list(VOX_SHAPED)
-
+*/
 /obj/item/clothing/under/rottensuit
 	name = "rotten suit"
 	desc = "This suit seems perfect for wearing underneath a disguise."
@@ -732,3 +739,57 @@
 	icon_state = "britpolice"
 	item_state = "britpolice"
 	_color = "britpolice"
+
+/obj/item/clothing/under/inquisitor
+	name = "inquisitor's suit"
+	desc = "Historically, inquisitors were cathar detectives who investigated crimes both mundane and supernatural. They were known for traveling to remote parishes plagued by unexplained murders, and for exposing the wicked living among normal humans."
+	icon_state = "uni-church"
+	item_state = "uni-church"
+	_color = "uni-church"
+
+/obj/item/clothing/under/newclothes
+	name = "Emperor's new clothes"
+	desc = "The virtuous can see them."
+	icon_state = "newclothes"
+	_color = "newclothes"
+	item_state = "r_suit"
+
+/obj/item/clothing/under/tourist
+	name = "tourist uniform"
+	desc = "A bright cyan shirt and a pair of brown shorts. Looks old."
+	icon_state = "tourist"
+	item_state = "g_suit"
+	_color = "tourist"
+	species_fit = list(GREY_SHAPED)
+
+/obj/item/clothing/under/varsity
+	name = "varsity jacket"
+	desc = "A jacket that belongs to either a high school student or an ancient German tyrant."
+	icon_state = "varsity"
+	item_state = "varsity"
+	_color = "varsity"
+
+/obj/item/clothing/under/galo
+	name = "delinquent clothes"
+	desc = "Yeah, Galo Sengen."
+	icon_state = "galo"
+	item_state = "galo"
+	_color = "galo"
+
+/obj/item/clothing/under/clownsuit
+	name = "formal clown outfit"
+	desc = "for clowns living in a society"
+	icon_state = "clownsuit"
+	item_state = "clownsuit"
+	_color = "clownsuit"
+
+/obj/item/clothing/under/skelesuit
+	name = "skeleton suit"
+	desc = "Inside of everyone there is a spooky skinman waiting to escape"
+	icon_state = "skelesuit"
+	item_state = "skelesuit"
+	_color = "skelesuit"
+	species_fit = list(VOX_SHAPED)
+	clothing_flags = ONESIZEFITSALL
+	flags = HIDEHAIRCOMPLETELY | HIDEBEARDHAIR
+	body_parts_covered = FULL_HEAD|BEARD

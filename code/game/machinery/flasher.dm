@@ -38,11 +38,6 @@ var/list/obj/machinery/flasher/flashers = list()
 	density = 1
 	min_harm_label = 35 //A lot. Has to wrap around the bulb, after all.
 
-/*
-/obj/machinery/flasher/New()
-	sleep(4)					//<--- What the fuck are you doing? D=
-	src.sd_SetLuminosity(2)
-*/
 /obj/machinery/flasher/power_change()
 	if ( powered() )
 		stat &= ~NOPOWER
@@ -89,9 +84,16 @@ var/list/obj/machinery/flasher/flashers = list()
 			continue
 		if (get_dist(src, O) > src.range)
 			continue
-
-		if (istype(O, /mob/living/carbon/alien))//So aliens don't get flashed (they have no external eyes)/N
+		if(O.blinded)
 			continue
+		if(istype(O, /mob/living/carbon/alien))//So aliens don't get flashed (they have no external eyes)/N
+			continue
+		if(isrobot(O)) //SOMEDAY WE WILL GIVE MOBS A FLASH_ACT OR EVEN FIX THE DAMN EYE/EAR CHECK MADNESS, BUT THAT DAY IS NOT TODAY
+			var/mob/living/silicon/robot/R = O
+			if(HAS_MODULE_QUIRK(R, MODULE_IS_FLASHPROOF))
+				continue
+			if(HAS_MODULE_QUIRK(R, MODULE_HAS_FLASH_RES))
+				strength = strength/2
 		if(istype(O, /mob/living))
 			var/mob/living/L = O
 			L.flash_eyes(affect_silicon = 1)
@@ -99,8 +101,10 @@ var/list/obj/machinery/flasher/flashers = list()
 			var/mob/living/carbon/C = O
 			if(C.eyecheck() <= 0) // Identical to handheld flash safety check
 				C.Knockdown(strength)
+				C.Stun(strength)
 		else
 			O.Knockdown(strength)
+			O.Stun(strength)
 
 
 /obj/machinery/flasher/emp_act(severity)

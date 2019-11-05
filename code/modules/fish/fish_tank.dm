@@ -33,6 +33,7 @@
 	density = FALSE
 	anchored = FALSE
 	throwpass = FALSE
+	var/circuitboard = null		// The circuitboard to eject when deconstructed
 
 	var/tank_type = ""			// Type of aquarium, used for icon updating
 	var/water_capacity = 0		// Number of units the tank holds (varies with tank type)
@@ -77,6 +78,7 @@
 	density = TRUE
 	anchored = TRUE
 	throwpass = TRUE				// You can throw objects over this, despite it's density, because it's short enough.
+	circuitboard = /obj/item/weapon/circuitboard/fishtank
 
 	tank_type = "tank"
 	water_capacity = 200		// Decent sized, holds 2 full large beakers worth
@@ -85,7 +87,7 @@
 	has_lid = TRUE
 	max_health = 50				// Average strength, will take a couple hits from a toolbox.
 	cur_health = 50
-	shard_count = 2
+	shard_count = 4
 
 
 /obj/machinery/fishtank/wall
@@ -95,6 +97,7 @@
 	density = TRUE
 	anchored = TRUE
 	throwpass = FALSE				// This thing is the size of a wall, you can't throw past it.
+	circuitboard = /obj/item/weapon/circuitboard/fishwall
 
 	tank_type = "wall"
 	water_capacity = 500		// This thing fills an entire tile,5 large beakers worth
@@ -103,7 +106,11 @@
 	has_lid = TRUE
 	max_health = 100			// This thing is a freaking wall, it can handle abuse.
 	cur_health = 100
-	shard_count = 3
+	shard_count = 9
+
+/obj/machinery/fishtank/wall/full
+	water_level = 500
+	food_level = MAX_FOOD
 
 /obj/machinery/fishtank/wall/full
 	water_level = 500
@@ -146,7 +153,7 @@
 		set_light(0)
 
 //////////////////////////////
-//		NEW() PROCS			//
+//		/NEW() PROCS			//
 //////////////////////////////
 
 /obj/machinery/fishtank/New()
@@ -356,7 +363,7 @@
 	update_icon()
 
 /obj/machinery/fishtank/proc/seadevil_eat()
-	var/tmp/list/fish_to_eat = fish_list.Copy()
+	var/list/fish_to_eat = fish_list.Copy()
 	fish_to_eat.Remove("sea devil")
 	var/eat_target = pick(fish_to_eat)
 	visible_message("<span class='notice'>The sea devil devours \an [eat_target].</span>")
@@ -386,7 +393,7 @@
 /obj/machinery/fishtank/proc/recursive_valid_egg(var/list/pick_egg_from)
 	var/fish = pick(pick_egg_from)
 	if(!fish || nonhatching_types.Find(fish))
-		var/tmp/list/new_list = pick_egg_from.Copy()
+		var/list/new_list = pick_egg_from.Copy()
 		return recursive_valid_egg(new_list.Remove(fish))
 		//If it's a nonvalid type, let's try again without it.
 	else
@@ -425,7 +432,10 @@
 			spill_water()
 	else																//We are deconstructing, make glass sheets instead of shards
 		var/sheets = shard_count + 1									//Deconstructing it salvages all the glass used to build the tank
-		new /obj/item/stack/sheet/glass/glass(get_turf(src), sheets)	//Produce the appropriate number of glass sheets, in a single stack (/glass/glass)
+		var/cur_turf = get_turf(src)
+		new /obj/item/stack/sheet/glass/glass(cur_turf, sheets)			//Produce the appropriate number of glass sheets, in a single stack (/glass/glass)
+		if(circuitboard)
+			new circuitboard(cur_turf)									//Eject the circuitboard
 	qdel(src)															//qdel the tank and it's contents
 
 

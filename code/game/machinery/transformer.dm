@@ -23,6 +23,7 @@
 	var/force_borg_module=null
 	var/name_type=NAMETYPE_NORMAL
 	var/enable_namepick=TRUE
+	var/belongstomalf=null //malf AI that owns autoborger
 
 /obj/machinery/transformer/New()
 	// On us
@@ -73,7 +74,7 @@
 		return
 
 	playsound(src, 'sound/items/Welder.ogg', 50, 1)
-	H.emote("scream",,, 1) // It is painful
+	H.audible_scream() // It is painful
 	H.adjustBruteLoss(max(0, 80 - H.getBruteLoss())) // Hurt the human, don't try to kill them though.
 	H.handle_regular_hud_updates() // Make sure they see the pain.
 
@@ -82,7 +83,7 @@
 
 	// Delete the items or they'll all pile up in a single tile and lag
 	// skipnaming disables namepick on New(). It's annoying as fuck on malf.  Later on, we enable or disable namepick.
-	var/mob/living/silicon/robot/R = H.Robotize(1, skipnaming=TRUE)
+	var/mob/living/silicon/robot/R = H.Robotize(1, skipnaming=TRUE, malfAI=belongstomalf)
 	if(R)
 		R.cell.maxcharge = robot_cell_charge
 		R.cell.charge = robot_cell_charge

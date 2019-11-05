@@ -142,12 +142,6 @@
 /obj/structure/closet/statue/open()
 	return
 
-/obj/structure/closet/statue/take_contents()
-	return
-
-/obj/structure/closet/statue/open()
-	return
-
 /obj/structure/closet/statue/insert()
 	return
 
@@ -185,7 +179,7 @@
 /obj/structure/closet/statue/place()
 	return
 
-/obj/structure/closet/statue/MouseDrop_T()
+/obj/structure/closet/statue/MouseDropTo()
 	return
 
 /obj/structure/closet/statue/relaymove()

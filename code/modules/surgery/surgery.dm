@@ -64,12 +64,19 @@
 		return 0
 	if (can_infect && affected)
 		spread_germs_to_organ(affected, user)
-	if (ishuman(user) && prob(60))
-		var/mob/living/carbon/human/H = user
-		if (blood_level)
-			H.bloody_hands(target,0)
-		if (blood_level > 1)
-			H.bloody_body(target,0)
+
+	if(!(affected.status & (ORGAN_ROBOT|ORGAN_PEG)))//robot organs and pegs can't spread diseases or splatter blood
+		var/block = user.check_contact_sterility(HANDS)
+		var/bleeding = user.check_bodypart_bleeding(HANDS)
+		target.oneway_contact_diseases(user,block,bleeding)//potentially spreads diseases from us to them, wear latex gloves!
+
+		if (ishuman(user) && prob(60))
+			var/mob/living/carbon/human/H = user
+			if (blood_level)
+				H.bloody_hands(target,0)//potentially spreads diseases from them to us, wear latex gloves!
+			if (blood_level > 1)
+				H.bloody_body(target,0)//potentially spreads diseases from them to us, wear a bio suit, or at least a labcoat!
+
 	if(istype(tool,/obj/item/weapon/scalpel/laser) || istype(tool,/obj/item/weapon/retractor/manager))
 		tool.icon_state = "[initial(tool.icon_state)]_on"
 		spawn(max_duration * tool.surgery_speed)//in case the player doesn't go all the way through the step (if he moves away, puts the tool away,...)
@@ -105,7 +112,7 @@ proc/do_surgery(mob/living/M, mob/living/user, obj/item/tool)
 	var/clumsy = 0
 	if(ishuman(user))
 		var/mob/living/carbon/human/H = user
-		clumsy = ((M_CLUMSY in H.mutations) && prob(50))
+		clumsy = (tool.clumsy_check(H) && prob(50))
 
 	var/target_area = user.zone_sel ? user.zone_sel.selecting : get_random_zone_sel()
 
@@ -135,7 +142,7 @@ proc/do_surgery(mob/living/M, mob/living/user, obj/item/tool)
 				else
 					if(sleep_fail)
 						to_chat(user, "<span class='warning'>The patient is squirming around in pain!</span>")
-						M.emote("scream",,, 1)
+						M.audible_scream()
 					M.attack_log += text("\[[time_stamp()]\] <font color='orange'>Has had surgery [S.type] with \the [tool] failed by [user.name] ([user.ckey])</font>")
 					user.attack_log += text("\[[time_stamp()]\] <font color='red'>Failed surgery [S.type] with \the [tool] on [M.name] ([M.ckey])</font>")
 					log_attack("<font color='red'>[user.name] ([user.ckey]) used \the [tool] to fail the surgery type [S.type] on [M.name] ([M.ckey])</font>")

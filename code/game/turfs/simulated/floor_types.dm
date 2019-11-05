@@ -33,7 +33,6 @@
 	name = "floor"
 
 /turf/simulated/floor/vox/wood
-	name = "floor"
 	icon_state = "wood"
 	floor_tile
 
@@ -149,6 +148,9 @@
 /turf/simulated/floor/engine/cult/cultify()
 	return
 
+/turf/simulated/floor/engine/cult/clockworkify()
+	return
+
 /turf/simulated/floor/engine/airless
 	oxygen = 0.01
 	nitrogen = 0.01
@@ -158,11 +160,7 @@
 /turf/simulated/floor/engine/n20/New()
 	..()
 	if(src.air)
-		// EXACTLY the same code as fucking roomfillers.  If this doesn't work, something's fucked.
-		var/datum/gas/sleeping_agent/trace_gas = new
-		air.trace_gases += trace_gas
-		trace_gas.moles = 9*4000
-		air.update_values()
+		air.adjust_gas(GAS_SLEEPING, 9 * 4000) //NO goddamn idea what those numbers mean, but it's what they were before
 
 /turf/simulated/floor/engine/nitrogen
 	name = "nitrogen floor"
@@ -362,26 +360,6 @@
 	name = "Iron Sand"
 	icon_state = "ironsand[rand(1,15)]"
 
-/turf/simulated/floor/plating/snow
-	name = "snow"
-	icon = 'icons/turf/snow.dmi'
-	icon_state = "snow"
-	gender = PLURAL
-
-/turf/simulated/floor/plating/snow/concrete
-	name = "concrete"
-	icon = 'icons/turf/floors.dmi'
-	icon_state = "concrete"
-
-/turf/simulated/floor/plating/snow/cold
-	temperature = 273
-/turf/simulated/floor/plating/snow/ex_act(severity)
-	return
-
-/turf/simulated/floor/plating/snow/ice
-	name = "ice"
-	icon_state = "ice"
-
 /turf/simulated/floor/plating/airless/damaged
 	icon_state = "platingdmg1"
 
@@ -396,6 +374,22 @@
 		icon_state = "panelscorched"
 
 	. = ..()
+
+//Server rooms, supercooled nitrogen atmosphere
+/turf/simulated/floor/server
+	icon_state = "dark"
+	oxygen = 0
+	temperature = 90
+	nitrogen = MOLES_O2STANDARD+MOLES_N2STANDARD
+
+/turf/simulated/floor/server/bluegrid
+	icon_state = "bcircuit"
+
+/turf/simulated/floor/server/one_atmosphere
+	nitrogen = (ONE_ATMOSPHERE*CELL_VOLUME/(90*R_IDEAL_GAS_EQUATION))
+
+/turf/simulated/floor/server/one_atmosphere/bluegrid
+	icon_state = "bcircuit"
 
 // VOX SHUTTLE SHIT
 /turf/simulated/shuttle/floor/vox

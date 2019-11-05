@@ -28,6 +28,10 @@
 	create_reagents(max_water)
 	reagents.add_reagent(WATER, max_water)
 
+/obj/item/weapon/extinguisher/empty/New()
+	. = ..()
+	reagents.clear_reagents()
+
 /obj/item/weapon/extinguisher/mini
 	name = "fire extinguisher"
 	desc = "A light and compact fibreglass-framed model fire extinguisher."
@@ -66,12 +70,7 @@
 /obj/item/weapon/extinguisher/examine(mob/user)
 	..()
 	if(!is_open_container())
-		to_chat(user, "It contains:")
-		if(reagents && reagents.reagent_list.len)
-			for(var/datum/reagent/R in reagents.reagent_list)
-				to_chat(user, "<span class='info'>[R.volume] units of [R.name]</span>")
-		else
-			to_chat(user, "<span class='info'>Nothing</span>")
+		reagents.get_examine(user)
 	for(var/thing in src)
 		to_chat(user, "<span class='warning'>\A [thing] is jammed into the nozzle!</span>")
 
@@ -100,7 +99,7 @@
 				flags &= ~OPENCONTAINER
 		return
 
-	if (istype(W, /obj/item) && !is_open_container() && !istype(src, /obj/item/weapon/extinguisher/foam) && !istype(W, /obj/item/weapon/evidencebag))
+	if (istype(W, /obj/item) && !is_open_container() && !istype(src, /obj/item/weapon/extinguisher/foam) && !istype(W, /obj/item/weapon/storage/evidencebag))
 		if(W.is_open_container())
 			return //We're probably trying to fill it
 		if(W.w_class > W_CLASS_TINY)

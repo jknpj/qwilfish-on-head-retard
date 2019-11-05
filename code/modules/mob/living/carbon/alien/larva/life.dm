@@ -3,7 +3,6 @@
 //How to copypaste human life code and pretend it won't fuck up everything for ALIEN LARVAE : The Novel : The Story : The Legend : The Epic : The Game
 //But seriously, someone's gonna have to look more in depth into this to get rid of useless shit
 /mob/living/carbon/alien/larva/Life()
-	set invisibility = 0
 	//set background = 1
 	if (!loc)
 		return
@@ -67,7 +66,7 @@
 /mob/living/carbon/alien/larva/proc/breathe()
 
 
-	if(reagents.has_reagent(LEXORIN))
+	if(reagents.has_any_reagents(LEXORINS))
 		return
 	if(istype(loc, /obj/machinery/atmospherics/unary/cryo_cell))
 		return
@@ -154,18 +153,19 @@
 	breath.update_values()
 
 	//Partial pressure of the toxins in our breath
-	var/Toxins_pp = (breath.toxins / breath.total_moles()) * breath.pressure
+	var/Toxins_pp = breath.partial_pressure(GAS_PLASMA)
 
 	if(Toxins_pp) // Detect toxins in air
-		AdjustPlasma(breath.toxins*250)
+		AdjustPlasma(breath[GAS_PLASMA]*250)
 		throw_alert(SA_TOXINS_XENO)
-		toxins_used = breath.toxins
+		toxins_used = breath[GAS_PLASMA]
 	else
 		clear_alert(SA_TOXINS_XENO)
 
 	//Breathe in toxins and out oxygen
-	breath.toxins -= toxins_used
-	breath.oxygen += toxins_used
+	breath.adjust_multi(
+		GAS_PLASMA, -toxins_used,
+		GAS_OXYGEN, toxins_used)
 
 	if(breath.temperature > (T0C+66) && !(M_RESIST_HEAT in mutations)) // Hot air hurts :(
 		if(prob(20))
@@ -202,7 +202,7 @@
 			sleeping += 1
 			Paralyse(5)
 
-	confused = max(0, confused - 1)
+	remove_confused(1)
 	// decrement dizziness counter, clamped to 0
 	if(resting)
 		dizziness = max(0, dizziness - 5)
@@ -233,7 +233,7 @@
 			//if( health <= 20 && prob(1) )
 			//	spawn(0)
 			//		emote("gasp")
-			if(!reagents.has_reagent(INAPROVALINE))
+			if(!reagents.has_any_reagents(list(INAPROVALINE,PRESLOMITE)))
 				adjustOxyLoss(1)
 			Paralyse(3)
 
@@ -280,6 +280,9 @@
 		if(knockdown)
 			knockdown = max(knockdown-1,0)	//before you get mad Rockdtben: I done this so update_canmove isn't called multiple times
 
+		if(say_mute)
+			say_mute = max(say_mute-1, 0)
+
 		if(stuttering)
 			stuttering = max(stuttering-1, 0)
 
@@ -291,7 +294,7 @@
 	return 1
 
 
-/mob/living/carbon/alien/larva/proc/handle_regular_hud_updates()
+/mob/living/carbon/alien/larva/handle_regular_hud_updates()
 
 
 	if (stat == 2 || (M_XRAY in mutations))

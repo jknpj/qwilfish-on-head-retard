@@ -58,6 +58,13 @@
 	src.adding += using
 	action_intent = using
 
+	// Cell
+	M.cells = getFromPool(/obj/abstract/screen)
+	M.cells.icon = 'icons/mob/screen1_robot.dmi'
+	M.cells.icon_state = "charge-empty"
+	M.cells.name = "cell"
+	M.cells.screen_loc = ui_toxin
+
 	// Health
 	mymob.healths = getFromPool(/obj/abstract/screen)
 	mymob.healths.icon = 'icons/mob/screen1_robot.dmi'

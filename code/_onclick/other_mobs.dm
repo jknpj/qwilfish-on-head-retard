@@ -52,10 +52,10 @@
 	else
 		A.attack_stump(src, params)
 
-	if(src.lying && !(isUnconscious() || stunned || paralysis) && check_crawl_ability() && isfloor(A) && isfloor(get_turf(src)) && proximity && !pulledby && !locked_to && !client.move_delayer.blocked())
-		var/crawldelay = round(1 + base_movement_tally()/5) * 1 SECONDS
-		Move(A, get_dir(src,A), glide_size_override = crawldelay)
-		delayNextMove(crawldelay, additive=1)
+	if(proximity && isobj(A))
+		var/obj/O = A
+		if(O.material_type)
+			O.material_type.on_use(O, src, null)
 
 /atom/proc/attack_hand(mob/user as mob, params, var/proximity)
 	return
@@ -72,7 +72,7 @@
 	return 0
 
 /mob/living/carbon/human/RestrainedClickOn(var/atom/A)
-	return
+	..()
 
 /mob/living/carbon/human/RangedAttack(var/atom/A)
 	if(!gloves && !mutations.len)
@@ -110,7 +110,7 @@
 /atom/proc/attack_animal(mob/user as mob)
 	return
 /mob/living/RestrainedClickOn(var/atom/A)
-	return
+	..()
 
 /*
 	Monkeys
@@ -144,7 +144,7 @@
 		ML.apply_damage(rand(1,3), BRUTE, dam_zone, armor)
 		for(var/mob/O in viewers(ML, null))
 			O.show_message("<span class='danger'>[name] has bit [ML]!</span>", 1)
-		if(armor >= 2)
+		if(armor >= 100)
 			return
 		if(ismonkey(ML))
 			for(var/datum/disease/D in viruses)

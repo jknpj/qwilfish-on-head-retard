@@ -19,7 +19,7 @@
 #define BEAM_DEL(x) del(x)
 
 #ifdef BEAM_DEBUG
-# warning SOME ASSHOLE FORGOT TO COMMENT BEAM_DEBUG BEFORE COMMITTING
+# warn SOME ASSHOLE FORGOT TO COMMENT BEAM_DEBUG BEFORE COMMITTING
 # define beam_testing(x) to_chat(world, "(Line: [__LINE__]) [x]")
 #else
 # define beam_testing(x)
@@ -58,7 +58,7 @@
 	var/targetDestroyKey=null // Key for the on_destroyed listener.
 	var/targetDensityKey=null // Key for the on_density_change listener
 	var/targetContactLoc=null // Where we hit the target (used for target_moved)
-
+	var/locDensity=null
 	var/list/sources = list() // Whoever served in emitting this beam. Used in prisms to prevent infinite loops.
 	var/_re_emit = 1 // Re-Emit from master when deleted? Set to 0 to not re-emit.
 
@@ -91,6 +91,12 @@
 		beam_testing("Disconnecting: Target moved.")
 		// Disconnect and re-emit.
 		disconnect()
+
+/obj/effect/beam/proc/turf_density_change(var/list/args)
+	var/turf/T = args["atom"]
+	var/atom/A = T.has_dense_content()
+	if(A && !(A in sources))
+		Crossed(A)
 
 // Listener for /atom/on_density_change
 /obj/effect/beam/proc/target_density_change(var/list/args)
@@ -137,7 +143,7 @@
 /obj/effect/beam/Bumped(var/atom/movable/AM)
 	if(!master || !AM)
 		return
-	if(istype(AM, /obj/effect/beam) || !AM.density)
+	if(istype(AM, /obj/effect/beam) || !AM.density || AM.Cross(src))
 		return
 	beam_testing("Bumped by [AM]")
 	am_connector=1
@@ -207,7 +213,7 @@
 /obj/effect/beam/proc/disconnect(var/re_emit=1)
 	var/obj/effect/beam/_master=get_master()
 	if(_master.target)
-		if(isatommovable(_master.target) && _master.target.on_moved)
+		if(ismovable(_master.target) && _master.target.on_moved)
 			_master.target.on_moved.Remove(_master.targetMoveKey)
 		_master.target.on_destroyed.Remove(_master.targetDestroyKey)
 		_master.target.beam_disconnect(_master)
@@ -225,7 +231,7 @@
 		beam_testing(" returning (!AM || !master)")
 		return
 
-	if(istype(AM, /obj/effect/beam) || (!AM.density && !istype(AM, /obj/effect/blob)))
+	if(istype(AM, /obj/effect/beam) || (!AM.density && !istype(AM, /obj/effect/blob)) || AM.Cross(src))
 		beam_testing(" returning (is beam or not dense)")
 		return
 
@@ -271,6 +277,10 @@
 		src._re_emit = 0
 		qdel(src)
 		return
+
+	var/turf/T = get_turf(src)
+	if(T && T.on_density_change)
+		locDensity = T.on_density_change.Add(src, "turf_density_change")
 
 	if((x == 1 || x == world.maxx || y == 1 || y == world.maxy))
 		//BEAM_DEL(src)
@@ -352,6 +362,9 @@
 					M.emitted_beams -= thing
 
 /obj/effect/beam/Destroy()
+	var/turf/T = get_turf(src)
+	if(T && T.on_density_change)
+		T.on_density_change.Remove(locDensity)
 	var/obj/effect/beam/ourselves = src
 	var/obj/effect/beam/ourmaster = get_master()
 	if(target)

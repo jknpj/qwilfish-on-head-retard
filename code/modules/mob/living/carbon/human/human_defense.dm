@@ -23,8 +23,8 @@ emp_act
 
 				return -1 // complete projectile permutation
 
-	if(check_shields(P.damage, "the [P.name]"))
-		P.on_hit(src, 2)
+	if(check_shields(P.damage, P))
+		P.on_hit(src, 100)
 		return 2
 	return (..(P , def_zone))
 
@@ -149,22 +149,13 @@ emp_act
 		body_coverage &= ~(C.body_parts_covered)
 	return body_coverage
 
-
-/mob/living/carbon/proc/check_shields(var/damage = 0, var/attack_text = "the attack")
-	if(!incapacitated())
-		for(var/obj/item/weapon/I in held_items)
-			if(I.IsShield() && I.on_block(damage, attack_text))
-				return 1
-
-	return 0
-
-/mob/living/carbon/human/check_shields(damage, attack_text = "the attack")
+/mob/living/carbon/human/check_shields(damage, atom/A)
 	if(..())
 		return 1
 
 	if(istype(wear_suit, /obj/item)) //Check armor
 		var/obj/item/I = wear_suit
-		if(I.IsShield() && I.on_block(damage, attack_text))
+		if(I.IsShield() && I.on_block(damage, A))
 			return 1
 
 /mob/living/carbon/human/emp_act(severity)
@@ -197,7 +188,9 @@ emp_act
 		return
 
 	var/target_zone = null
-	if(originator)
+	if(def_zone)
+		target_zone = def_zone
+	else if(originator)
 		if(ismob(originator))
 			var/mob/M = originator
 			target_zone = get_zone_with_miss_chance(M.zone_sel.selecting, src)
@@ -215,24 +208,15 @@ emp_act
 		return FALSE
 	var/hit_area = affecting.display_name
 
-	if(istype(I,/obj/item/weapon/card/emag))
-		if(!(affecting.status & ORGAN_ROBOT))
-			to_chat(user, "<span class='warning'>That limb isn't robotic.</span>")
-			return FALSE
-		if(affecting.sabotaged)
-			to_chat(user, "<span class='warning'>\The [src]'s [hit_area] is already sabotaged!</span>")
-		else
-			to_chat(user, "<span class='warning'>You sneakily slide [I] into the dataport on \the [src]'s [hit_area] and short out the safeties.</span>")
-			affecting.sabotaged = TRUE
-		return FALSE
-
-
 	if(istype(I.attack_verb, /list) && I.attack_verb.len && !(I.flags & NO_ATTACK_MSG))
 		visible_message("<span class='danger'>\The [user] [pick(I.attack_verb)] \the [src] in \the [hit_area] with \the [I]!</span>", \
 			"<span class='userdanger'>\The [user] [pick(I.attack_verb)] you in \the [hit_area] with \the [I]!</span>")
 	else if(!(I.flags & NO_ATTACK_MSG))
 		visible_message("<span class='danger'>\The [user] attacks \the [src] in \the [hit_area] with \the [I.name]!</span>", \
 			"<span class='userdanger'>\The [user] attacks you in \the [hit_area] with \the [I.name]!</span>")
+
+	//Contact diseases on the weapon?
+	I.disease_contact(src,get_part_from_limb(target_zone))
 
 	//Knocking teeth out!
 	var/knock_teeth = 0
@@ -243,7 +227,7 @@ emp_act
 				knock_teeth = 1
 		else if(user.zone_sel.selecting == "mouth" && target_zone == LIMB_HEAD)
 			knock_teeth = 1
-	else if(user.zone_sel.selecting == "mouth" && target_zone == LIMB_HEAD)
+	else if(user.zone_sel && user.zone_sel.selecting == "mouth" && target_zone == LIMB_HEAD)
 		knock_teeth = 1
 
 	var/armor = run_armor_check(affecting, "melee", quiet = 1)
@@ -274,9 +258,9 @@ emp_act
 				if(prob(final_force))
 					if(apply_effect(20, PARALYZE, armor))
 						visible_message("<span class='danger'>[src] has been knocked unconscious!</span>")
-						if(src != user && I.damtype == BRUTE && isrev(src))
-							ticker.mode.remove_revolutionary(mind)
-							add_attacklogs(user, src, "de-converted from Revolutionary!")
+						// if(src != user && I.damtype == BRUTE && isrev(src))
+						// 	ticker.mode.remove_revolutionary(mind)
+						// 	add_attacklogs(user, src, "de-converted from Revolutionary!")
 
 				if(bloody)//Apply blood
 					if(wear_mask)
@@ -333,10 +317,17 @@ emp_act
 			self_drugged_message = "<span class='info'>The tooth fairy takes some of your teeth out, and gives you a dollar.</span>")
 
 /mob/living/carbon/human/proc/bloody_hands(var/mob/living/source, var/amount = 2)
+	//we're getting splashed with blood, so let's check for viruses
+	var/block = check_contact_sterility(HANDS)
+	var/bleeding = check_bodypart_bleeding(HANDS)
+	oneway_contact_diseases(source,block,bleeding)
+
 	if (gloves)
-		gloves.add_blood(source)
-		gloves:transfer_blood = amount
-		gloves:bloody_hands_mob = source
+		var/obj/item/clothing/gloves/G = gloves
+		G.add_blood(source)
+		if (istype(G))
+			G.transfer_blood = amount
+			G.bloody_hands_mob = source
 	else
 		add_blood(source)
 		bloody_hands = amount
@@ -344,11 +335,24 @@ emp_act
 	update_inv_gloves()		//updates on-mob overlays for bloody hands and/or bloody gloves
 
 /mob/living/carbon/human/proc/bloody_body(var/mob/living/source,var/update = 0)
+	//we're getting splashed with blood, so let's check for viruses
+	var/block = check_contact_sterility(FULL_TORSO)
+	var/bleeding = check_bodypart_bleeding(FULL_TORSO)
+	oneway_contact_diseases(source,block,bleeding)
+
 	if(wear_suit)
 		wear_suit.add_blood(source)
 		update_inv_wear_suit(update)
 	if(w_uniform)
 		w_uniform.add_blood(source)
+		update_inv_w_uniform(update)
+
+/mob/living/carbon/human/apply_luminol(var/update = FALSE) //Despite what you might think with FALSE this will update things as normal.
+	if(wear_suit)
+		wear_suit.apply_luminol()
+		update_inv_wear_suit(update)
+	if(w_uniform)
+		w_uniform.apply_luminol()
 		update_inv_w_uniform(update)
 
 /mob/living/carbon/human/ex_act(var/severity, var/noblind = FALSE)
@@ -381,7 +385,7 @@ emp_act
 				return
 
 			else if (stat == 2 && !client)
-				gibs(loc, viruses)
+				gibs(loc, virus2)
 				qdel(src)
 				return
 
@@ -483,4 +487,6 @@ emp_act
 			var/datum/organ/external/affecting = get_organ(ran_zone(dam_zone))
 
 			apply_damage(run_armor_absorb(affecting, "melee", rand(30,40)), BRUTE, affecting, run_armor_check(affecting, "melee"))
-	return
+
+/mob/living/carbon/human/acidable()
+	return !(species && species.anatomy_flags & ACID4WATER)

@@ -81,7 +81,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 	ghost_write = 1 // Allow ghosts to send Topic()s.
 	custom_aghost_alerts = 1 // We handle our own logging.
 
-	var/screen = 0                  
+	var/screen = 0
 		//Or maybe I'll make it into a list within a list afterwards... whichever I prefer, go fuck yourselves :3
 		// 0 = welcome screen - main menu
 		// 1 = view feed channels
@@ -263,7 +263,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 						if(CHANNEL.is_admin_channel)
 							dat+="<B><FONT style='BACKGROUND-COLOR: LightGreen '><A href='?src=\ref[src];show_channel=\ref[CHANNEL]'>[CHANNEL.channel_name]</A></FONT></B><BR>"
 						else
-							dat+="<B><A href='?src=\ref[src];show_channel=\ref[CHANNEL]'>[CHANNEL.channel_name]</A> [(CHANNEL.censored) ? ("<FONT COLOR='red'>***</FONT>") : ()]<BR></B>"
+							dat+="<B><A href='?src=\ref[src];show_channel=\ref[CHANNEL]'>[CHANNEL.channel_name]</A> [(CHANNEL.censored) ? ("<FONT COLOR='red'>***</FONT>") : ""]<BR></B>"
 
 				dat += {"<BR><HR><A href='?src=\ref[src];refresh=1'>Refresh</A>
 					<BR><A href='?src=\ref[src];setScreen=[NEWSCASTER_MENU]'>Back</A>"}
@@ -354,7 +354,8 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 							dat+="-[MESSAGE.body] <BR>"
 							if(MESSAGE.img)
 								usr << browse_rsc(MESSAGE.img, "tmp_photo[i].png")
-								dat+="<a href='?src=\ref[src];show_photo_info=\ref[MESSAGE]'><img src='tmp_photo[i].png' width = '180'></a><BR><BR>"
+
+								dat+="<a href='?src=\ref[src];show_photo_info=\ref[MESSAGE]'><img src='tmp_photo[i].png' width = '192'></a><BR><BR>"
 							dat+="<FONT SIZE=1>\[Story by <FONT COLOR='maroon'>[MESSAGE.author]</FONT>\]</FONT><BR>"
 
 				dat += {"<BR><HR><A href='?src=\ref[src];refresh=1'>Refresh</A>
@@ -369,7 +370,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 					dat+="<I>No feed channels found active...</I><BR>"
 				else
 					for(var/datum/feed_channel/CHANNEL in news_network.network_channels)
-						dat+="<A href='?src=\ref[src];pick_censor_channel=\ref[CHANNEL]'>[CHANNEL.channel_name]</A> [(CHANNEL.censored) ? ("<FONT COLOR='red'>***</FONT>") : ()]<BR>"
+						dat+="<A href='?src=\ref[src];pick_censor_channel=\ref[CHANNEL]'>[CHANNEL.channel_name]</A> [(CHANNEL.censored) ? ("<FONT COLOR='red'>***</FONT>") : ""]<BR>"
 				dat+="<BR><A href='?src=\ref[src];setScreen=[NEWSCASTER_MENU]'>Cancel</A>"
 			if(NEWSCASTER_D_NOTICE_MENU)
 
@@ -381,7 +382,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 					dat+="<I>No feed channels found active...</I><BR>"
 				else
 					for(var/datum/feed_channel/CHANNEL in news_network.network_channels)
-						dat+="<A href='?src=\ref[src];pick_d_notice=\ref[CHANNEL]'>[CHANNEL.channel_name]</A> [(CHANNEL.censored) ? ("<FONT COLOR='red'>***</FONT>") : ()]<BR>"
+						dat+="<A href='?src=\ref[src];pick_d_notice=\ref[CHANNEL]'>[CHANNEL.channel_name]</A> [(CHANNEL.censored) ? ("<FONT COLOR='red'>***</FONT>") : ""]<BR>"
 
 				dat+="<BR><A href='?src=\ref[src];setScreen=[NEWSCASTER_MENU]'>Back</A>"
 			if(NEWSCASTER_CENSORSHIP_CHANNEL)
@@ -495,7 +496,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 			if(isobserver(usr) && !canGhostWrite(usr,src,"set a channel's name"))
 				to_chat(usr, "<span class='warning'>You can't do that.</span>")
 				return
-			channel_name = strip_html_simple(input(usr, "Provide a Feed Channel Name", "Network Channel Handler", ""))
+			channel_name = stripped_input(usr, "Provide a Feed Channel Name", "Network Channel Handler", "")
 			while (findtext(channel_name," ") == 1)
 				channel_name = copytext(channel_name,2,length(channel_name)+1)
 			updateUsrDialog()
@@ -545,7 +546,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 			for(var/datum/feed_channel/F in news_network.network_channels)
 				if( (!F.locked || F.author == scanned_user) && !F.censored)
 					available_channels += F.channel_name
-			channel_name = strip_html_simple(input(usr, "Choose receiving Feed Channel", "Network Channel Handler") in available_channels )
+			channel_name = utf8_sanitize(input(usr, "Choose receiving Feed Channel", "Network Channel Handler") in available_channels )
 			updateUsrDialog()
 
 		else if(href_list["set_new_message"])
@@ -554,7 +555,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 				return
 			if(isnull(msg))
 				msg = ""
-			msg = strip_html(input(usr, "Write your Feed story", "Network Channel Handler", msg))
+			msg = stripped_input(usr, "Write your Feed story", "Network Channel Handler", msg)
 			while (findtext(msg," ") == 1)
 				msg = copytext(msg,2,length(msg)+1)
 			updateUsrDialog()
@@ -697,7 +698,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 			if(isobserver(usr) && !canGhostWrite(usr,src,"tried to set the name of a wanted person"))
 				to_chat(usr, "<span class='warning'>You can't do that.</span>")
 				return
-			channel_name = strip_html(input(usr, "Provide the name of the Wanted person", "Network Security Handler", ""))
+			channel_name = stripped_input(usr, "Provide the name of the Wanted person", "Network Security Handler", "")
 			while (findtext(channel_name," ") == 1)
 				channel_name = copytext(channel_name,2,length(channel_name)+1)
 			updateUsrDialog()
@@ -706,7 +707,7 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 			if(isobserver(usr) && !canGhostWrite(usr,src,"tried to set the description of a wanted person"))
 				to_chat(usr, "<span class='warning'>You can't do that.</span>")
 				return
-			msg = strip_html(input(usr, "Provide the a description of the Wanted person and any other details you deem important", "Network Security Handler", ""))
+			msg = stripped_input(usr, "Provide the a description of the Wanted person and any other details you deem important", "Network Security Handler", "")
 			while (findtext(msg," ") == 1)
 				msg = copytext(msg,2,length(msg)+1)
 			updateUsrDialog()
@@ -891,13 +892,13 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 					qdel(src)
 					return
 
-			if(isscrewdriver(I) && !(stat & BROKEN))
+			if(I.is_screwdriver(user) && !(stat & BROKEN))
 				user.visible_message("<span class='notice'>[user] screws in the [src]!</span>", "<span class='notice'>You screw in the [src]</span>")
 				playsound(src, 'sound/items/Screwdriver.ogg', 100, 1)
 				buildstage = 1
 
 		if(1)
-			if(isscrewdriver(I) && !(stat & BROKEN))
+			if(I.is_screwdriver(user) && !(stat & BROKEN))
 				user.visible_message("<span class='notice'>[user] unscrews the [src]!</span>", "<span class='notice'>You unscrew the [src]</span>")
 				playsound(src, 'sound/items/Screwdriver.ogg', 100, 1)
 				buildstage = 0
@@ -943,11 +944,6 @@ var/list/obj/machinery/newscaster/allCasters = list() //Global list that will co
 				else
 					to_chat(user, "<span class='notice'>This does nothing.</span>")
 	update_icon()
-
-/obj/machinery/newscaster/attack_ai(mob/user as mob)
-	add_hiddenprint(user)
-	return attack_hand(user) //or maybe it'll have some special functions? No idea.
-
 
 /obj/machinery/newscaster/attack_paw(mob/user as mob)
 	to_chat(user, "<span class='notice'>The newscaster controls are far too complicated for your tiny brain!</span>")
@@ -1136,9 +1132,9 @@ obj/item/weapon/newspaper/Topic(href, href_list)
 obj/item/weapon/newspaper/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/weapon/pen))
 		if(scribble_page == curr_page)
-			to_chat(user, "<FONT COLOR='blue'>There's already a scribble in this page... You wouldn't want to make things too cluttered, would you?</FONT>")
+			to_chat(user, "<span class='notice'>There's already a scribble in this page... You wouldn't want to make things too cluttered, would you?</span>")
 		else
-			var/s = strip_html( input(user, "Write something", "Newspaper", "") )
+			var/s = stripped_input(user, "Write something", "Newspaper", "")
 			s = copytext(sanitize(s), 1, MAX_MESSAGE_LEN)
 			if (!s)
 				return

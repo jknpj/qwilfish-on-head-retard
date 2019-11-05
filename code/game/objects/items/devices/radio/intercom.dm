@@ -15,8 +15,8 @@
 /obj/item/device/radio/intercom/supports_holomap()
 	return TRUE
 
-/obj/item/device/radio/intercom/universe/New()
-	return ..()
+/obj/item/device/radio/intercom/universe/GhostsAlwaysHear()
+	return TRUE
 
 /obj/item/device/radio/intercom/initialize()
 	..()
@@ -95,7 +95,7 @@
 			else
 				return ..()
 		if(2)
-			if(isscrewdriver(W))
+			if(W.is_screwdriver(user))
 				playsound(src, 'sound/items/Screwdriver.ogg', 50, 1)
 				if(do_after(user, src, 10))
 					update_icon()
@@ -137,11 +137,7 @@
 				return 1
 			if(iswelder(W))
 				var/obj/item/weapon/weldingtool/WT=W
-				playsound(src, 'sound/items/Welder.ogg', 50, 1)
-				if(!WT.remove_fuel(3, user))
-					to_chat(user, "<span class='warning'>You're out of welding fuel.</span>")
-					return 1
-				if(do_after(user, src, 10))
+				if(WT.do_weld(user, src, 10, 5))
 					to_chat(user, "<span class='notice'>You cut the intercom frame from the wall!</span>")
 					new /obj/item/mounted/frame/intercom(get_turf(src))
 					qdel(src)
@@ -156,11 +152,12 @@
 /obj/item/device/radio/intercom/process()
 	if(((world.timeofday - last_tick) > 30) || ((world.timeofday - last_tick) < 0))
 		last_tick = world.timeofday
-		if(!areaMaster)
+		var/area/this_area = get_area(src)
+		if(!this_area)
 			on = 0
 			update_icon()
 			return
-		on = areaMaster.powered(EQUIP) // set "on" to the power status
+		on = this_area.powered(EQUIP) // set "on" to the power status
 		update_icon()
 
 /obj/item/weapon/intercom_electronics
@@ -175,7 +172,10 @@
 
 /obj/item/device/radio/intercom/medbay
 	name = "station intercom (Medbay)"
-	frequency = 1485
+
+/obj/item/device/radio/intercom/medbay/initialize()
+	..()
+	set_frequency(MED_FREQ)
 
 /obj/item/device/radio/intercom/medbay/broadcast_nospeaker
 	broadcasting = 1

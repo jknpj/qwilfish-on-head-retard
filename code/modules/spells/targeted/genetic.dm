@@ -32,6 +32,7 @@ code\game\\dna\genes\goon_powers.dm
 	name = "Blind"
 	desc = "Temporarily blind a single person."
 	abbreviation = "BD"
+	specialization = OFFENSIVE
 	disabilities = 1
 	duration = 300
 
@@ -58,6 +59,7 @@ code\game\\dna\genes\goon_powers.dm
 	name = "Mutate"
 	desc = "This spell causes you to turn into a hulk and gain laser vision for a short while."
 	abbreviation = "MU"
+	specialization = UTILITY
 
 	school = "transmutation"
 	charge_max = 400
@@ -74,3 +76,43 @@ code\game\\dna\genes\goon_powers.dm
 
 	hud_state = "wiz_hulk"
 	user_type = USER_TYPE_WIZARD
+
+/spell/targeted/genetic/mutate/highlander
+	name = "Become Highlander"
+	desc = "Temporarily turn into a mighty highlander who cannot be stunned."
+	invocation = "SCOTLAND FOREVER!"
+	mutations = list(M_HULK)
+	message = "<span class='notice'>You feel powerful! Nobody can take you down! It's time to take some heads!</span>"
+	user_type = USER_TYPE_OTHER
+
+/spell/targeted/genetic/eat_weed
+	name = "Eat Weeds"
+	desc = "Devour weeds from soil or a hydroponics tray, gaining nutriment."
+	spell_flags = INCLUDEUSER
+	message = ""
+	range = 0
+	duration = 0
+	max_targets = 1
+	//mutations = list(M_EATWEEDS) - Some day, maybe, if this is ported to Diona nymphs instead of a verb
+	hud_state = "produce"
+	override_icon = 'icons/obj/hydroponics/ambrosiavulgaris.dmi'
+
+/spell/targeted/genetic/eat_weed/cast(list/targets, var/mob/user)
+	..()
+	if(!ishuman(user))
+		return //We'll have to add an exception for monkeys if this is ported to diona
+	var/mob/living/carbon/human/H = user
+	var/list/trays = list()
+	for(var/obj/machinery/portable_atmospherics/hydroponics/tray in range(1))
+		if(tray.weedlevel > 0)
+			trays += tray
+
+	var/obj/machinery/portable_atmospherics/hydroponics/target = input(H,"Select a tray:") as null|anything in trays
+
+	if(!isnull(gcDestroyed) || !target || target.weedlevel == 0)
+		return
+
+	H.reagents.add_reagent(NUTRIMENT, target.weedlevel)
+	target.weedlevel = 0
+
+	user.visible_message("<span class='warning'>[user] begins rooting through [target], ripping out weeds and eating them noisily.</span>","<span class='warning'>You begin rooting through [target], ripping out weeds and eating them noisily.</span>")

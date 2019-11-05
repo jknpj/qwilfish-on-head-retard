@@ -1,5 +1,4 @@
 /mob/living/carbon/brain/Life()
-	set invisibility = 0
 	//set background = 1
 	if(timestopped)
 		return 0 //under effects of time magick
@@ -114,7 +113,7 @@
 	if(reagents)
 		reagents.metabolize(src)
 
-	confused = max(0, confused - 1)
+	remove_confused(1)
 	// decrement dizziness counter, clamped to 0
 	if(resting)
 		dizziness = max(0, dizziness - 5)
@@ -210,7 +209,7 @@
 	return 1
 
 
-/mob/living/carbon/brain/proc/handle_regular_hud_updates()
+/mob/living/carbon/brain/handle_regular_hud_updates()
 
 
 	if (stat == 2 || (M_XRAY in src.mutations))

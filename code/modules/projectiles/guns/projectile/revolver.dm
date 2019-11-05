@@ -3,7 +3,7 @@
 	name = "revolver"
 	icon_state = "detective"
 	max_shells = 6
-	caliber = list("38" = 1, "357" = 1)
+	caliber = list(POINT38 = 1, POINT357 = 1)
 	origin_tech = Tc_COMBAT + "=2;" + Tc_MATERIALS + "=2"
 	ammo_type = "/obj/item/ammo_casing/c38"
 	var/perfect = 0
@@ -11,7 +11,7 @@
 	special_check(var/mob/living/carbon/human/M) //to see if the gun fires 357 rounds safely. A non-modified revolver randomly blows up
 		if(getAmmo()) //this is a good check, I like this check
 			var/obj/item/ammo_casing/AC = loaded[1]
-			if(caliber["38"] == 0) //if it's been modified, this is true
+			if(caliber[POINT38] == 0) //if it's been modified, this is true
 				return 1
 			if(istype(AC, /obj/item/ammo_casing/a357) && !perfect && prob(70 - (getAmmo() * 10)))	//minimum probability of 10, maximum of 60
 				to_chat(M, "<span class='danger'>[src] blows up in your face.</span>")
@@ -42,14 +42,14 @@
 
 	attackby(var/obj/item/A as obj, mob/user as mob)
 		..()
-		if(isscrewdriver(A) || istype(A, /obj/item/weapon/conversion_kit))
+		if(A.is_screwdriver(user) || istype(A, /obj/item/weapon/conversion_kit))
 			var/obj/item/weapon/conversion_kit/CK
 			if(istype(A, /obj/item/weapon/conversion_kit))
 				CK = A
 				if(!CK.open)
 					to_chat(user, "<span class='notice'>This [CK.name] is useless unless you open it first. </span>")
 					return
-			if(caliber["38"])
+			if(caliber[POINT38])
 				to_chat(user, "<span class='notice'>You begin to reinforce the barrel of [src].</span>")
 				if(getAmmo())
 					afterattack(user, user)	//you know the drill
@@ -60,7 +60,7 @@
 					if(getAmmo())
 						to_chat(user, "<span class='notice'>You can't modify it!</span>")
 						return
-					caliber["38"] = 0
+					caliber[POINT38] = 0
 					desc = "The barrel and chamber assembly seems to have been modified."
 					to_chat(user, "<span class='warning'>You reinforce the barrel of [src]! Now it will fire .357 rounds.</span>")
 					if(CK && istype(CK))
@@ -76,7 +76,7 @@
 					if(getAmmo())
 						to_chat(user, "<span class='notice'>You can't modify it!</span>")
 						return
-					caliber["38"] = 1
+					caliber[POINT38] = 1
 					desc = initial(desc)
 					to_chat(user, "<span class='warning'>You remove the modifications on [src]! Now it will fire .38 rounds.</span>")
 					perfect = 0
@@ -89,6 +89,23 @@
 	desc = "When you absolutely, positively need a 10mm hole in the other guy. Uses .357 ammo."	//>10mm hole >.357
 	icon_state = "mateba"
 	origin_tech = Tc_COMBAT + "=2;" + Tc_MATERIALS + "=2"
+	
+	
+/obj/item/weapon/gun/projectile/nagant //revolver that simple mob russians use
+	name = "nagant revolver"
+	desc = "Just like in those neo-russian spy movies! Uses 7.62x38R ammo."
+	icon_state = "nagant"
+	max_shells = 7
+	origin_tech = Tc_COMBAT + "=2;" + Tc_MATERIALS + "=2"
+	caliber = list(NAGANTREVOLVER = 1)
+	ammo_type = "/obj/item/ammo_casing/c762x38r"
+	gun_flags = SILENCECOMP
+	fire_sound = 'sound/weapons/nagant.ogg'
+	
+/obj/item/weapon/gun/projectile/nagant/update_icon()
+	..()
+	icon_state = "[initial(icon_state)][silenced ? "-silencer" : ""]"
+	return
 
 
 // A gun to play Russian Roulette!
@@ -277,8 +294,8 @@
 /obj/item/weapon/gun/projectile/banana
 	name = "banana"
 	desc = "It's an excellent prop for a comedy."
-	icon = 'icons/obj/items.dmi'
-	icon_state = "banana"
+	icon = 'icons/obj/hydroponics/banana.dmi'
+	icon_state = "produce"
 	item_state = "banana"
 	max_shells = 1
 	gun_flags = 0

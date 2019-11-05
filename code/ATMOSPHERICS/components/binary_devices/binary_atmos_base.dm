@@ -53,6 +53,9 @@
 	if(!allowed(user))
 		to_chat(user, "<span class='warning'>Access denied.</span>")
 		return FALSE
+	if(!user.dexterity_check())
+		to_chat(user, "<span class='warning'>You don't have the dexterity to do this!</span>")
+		return FALSE
 	on = !on
 	investigation_log(I_ATMOS, "was turned [on ? "on" : "off"] by [key_name(user)].")
 	update_icon()
@@ -82,6 +85,19 @@
 		node2.initialize()
 		node2.build_network()
 	return 1
+
+//this is used when a machine_flags = WRENCHMOVE machine gets anchored down
+//we want to check that it doesn't form any connections where there is already a connection
+/obj/machinery/atmospherics/binary/wrenchAnchor(var/mob/user)
+	//this has to be first because ..() already starts the anchoring
+	if(!anchored)
+		for(var/obj/machinery/atmospherics/M in src.loc)
+			if(M == src || M.piping_layer != src.piping_layer && !(M.pipe_flags & ALL_LAYER))
+				continue
+			if(M.has_initialize_direction(dir | turn(dir, 180), PIPE_TYPE_STANDARD))
+				to_chat(user, "<span class='warning'>There is already a pipe connection in that direction.</span>")
+				return FALSE
+	. = ..()
 
 // Housekeeping and pipe network stuff below
 /obj/machinery/atmospherics/binary/network_expand(datum/pipe_network/new_network, obj/machinery/atmospherics/pipe/reference)
@@ -117,6 +133,9 @@
 	if(node1 && node2)
 		return
 
+	// While other pipes/atmos machinery can use whatever node for any other pipe,
+	// most binary pumps must specifically have the succ end on node1, and the blow
+	// end on node2.
 	node1 = findConnecting(turn(dir, 180))
 	node2 = findConnecting(dir)
 

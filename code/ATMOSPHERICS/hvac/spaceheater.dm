@@ -21,6 +21,9 @@
 	flags = FPRINT
 	machine_flags = SCREWTOGGLE
 
+/obj/machinery/space_heater/get_cell()
+	return cell
+
 /obj/machinery/space_heater/campfire
 	name = "campfire"
 	icon_state = "campfire0"
@@ -127,23 +130,23 @@
 	..()
 	var/turf/T = get_turf(src)
 	var/datum/gas_mixture/env = T.return_air()
-	if(env.molar_density("oxygen") < 5 / CELL_VOLUME)
+	if(env.molar_density(GAS_OXYGEN) < 5 / CELL_VOLUME)
 		to_chat(user, "<span class='notice'>You try to light \the [name], but it won't catch on fire!")
 		return
 	if(!on && cell.charge > 0)
 	//Items with special messages go first - yes, this is all stolen from cigarette code. sue me.
-		if(istype(I, /obj/item/weapon/weldingtool))
+		if(iswelder(I))
 			var/obj/item/weapon/weldingtool/WT = I
 			if(WT.is_hot()) //Badasses dont get blinded while lighting their !!campfire!! with a welding tool
-				light("<span class='notice'>[user] casually lights \the [name] with \his [I], what a badass.</span>")
+				light("<span class='notice'>[user] casually lights \the [name] with \the [I], what a badass.</span>")
 		else if(istype(I, /obj/item/weapon/lighter/zippo))
 			var/obj/item/weapon/lighter/zippo/Z = I
 			if(Z.is_hot())
-				light("<span class='rose'>With a single flick of their wrist, [user] smoothly lights \the [name] with \his [I]. Damn, that's cool.</span>")
+				light("<span class='rose'>With a single flick of their wrist, [user] smoothly lights \the [name] with \the [I]. Damn, that's cool.</span>")
 		else if(istype(I, /obj/item/weapon/lighter))
 			var/obj/item/weapon/lighter/L = I
 			if(L.is_hot())
-				light("<span class='notice'>After some fiddling, [user] manages to light \the [name] with \his [I].</span>")
+				light("<span class='notice'>After some fiddling, [user] manages to light \the [name] with \the [I].</span>")
 		else if(istype(I, /obj/item/weapon/melee/energy/sword))
 			var/obj/item/weapon/melee/energy/sword/S = I
 			if(S.is_hot())
@@ -154,11 +157,11 @@
 				light("<span class='notice'>[user] fiddles with \his [I.name], and manages to light \the [name].</span>")
 		//All other items are included here, any item that is hot can light the campfire
 		else if(I.is_hot())
-			light("<span class='notice'>[user] lights \the [name] with \his [I].</span>")
+			light("<span class='notice'>[user] lights \the [name] with \the [I].</span>")
 		return
 	if(istype(I, /obj/item/stack/sheet/wood) && ((on)||(nocell == 2)))
 		var/woodnumber = input(user, "You may insert a maximum of four planks.", "How much wood would you like to add to \the [src]?", 0) as num
-		woodnumber = Clamp(woodnumber,0,4)
+		woodnumber = clamp(woodnumber,0,4)
 		var/obj/item/stack/sheet/wood/woody = I
 		woody.use(woodnumber)
 		user.visible_message("<span class='notice'>[user] adds some wood to \the [src].</span>", "<span class='notice'>You add some wood to \the [src].</span>")
@@ -246,7 +249,7 @@
 				var/value = text2num(href_list["val"])
 
 				// limit to 20-90 degC
-				set_temperature = Clamp(set_temperature + value, 20, 90)
+				set_temperature = clamp(set_temperature + value, 20, 90)
 
 			if("cellremove")
 				if(panel_open && cell && !usr.get_active_hand())
@@ -317,7 +320,7 @@
 	var/list/comfyfire = list('sound/misc/comfyfire1.ogg','sound/misc/comfyfire2.ogg','sound/misc/comfyfire3.ogg',)
 	if(Floor(cell.charge/10) != lastcharge)
 		update_icon()
-	if(!(cell && cell.charge > 0) && nocell != 2 | env.oxygen < 5)
+	if(!(cell && cell.charge > 0) && nocell != 2 | env.molar_density(GAS_OXYGEN) < 5 / CELL_VOLUME)
 		new /obj/effect/decal/cleanable/campfire(get_turf(src))
 		qdel(src)
 		return

@@ -19,6 +19,9 @@
 		return
 
 	var/list/modifiers = params2list(params)
+	if(modifiers["middle"] && modifiers["shift"])
+		MiddleShiftClickOn(A)
+		return
 	if(modifiers["middle"])
 		MiddleClickOn(A)
 		return
@@ -43,7 +46,10 @@
 		aicamera.toggle_camera_mode(src)
 		aicamera.captureimage(A, src)
 		return
-
+	
+	if(INVOKE_EVENT(on_uattack,list("atom"=A)))
+		return
+		
 	var/obj/item/W = get_active_hand()
 
 	// Cyborgs have no range-checking unless there is item use
@@ -141,20 +147,6 @@
 		return
 	A.RobotAltClick(src)
 	return
-
-/mob/living/silicon/robot/ShiftClickOn(var/atom/A)
-	//Borgs can into doors as well
-	if(istype(A, /obj/machinery/door/airlock))
-		A.AIShiftClick(src)
-		return
-	..()
-
-/mob/living/silicon/robot/CtrlClickOn(var/atom/A)
-	//Borgs can into doors as well
-	if(istype(A, /obj/machinery/door/airlock))
-		A.AICtrlClick(src)
-		return
-	..()
 
 /*
 	As with AI, these are not used in click code,

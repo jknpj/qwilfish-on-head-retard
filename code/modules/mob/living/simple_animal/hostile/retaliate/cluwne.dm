@@ -12,9 +12,9 @@
 	icon_gib = "clown_gib"
 	speak_chance = 50
 	turns_per_move = 5
-	response_help = "pokes the"
-	response_disarm = "gently pushes aside the"
-	response_harm = "hits the"
+	response_help = "pokes"
+	response_disarm = "gently pushes aside"
+	response_harm = "hits"
 	speak = list("HONK", "Honk!", "PLEASE KILL ME")
 	speak_emote = list("squeals", "cries","sobs")
 	emote_hear = list("honks sadly")
@@ -22,6 +22,8 @@
 	a_intent = I_HELP
 	var/footstep=0 // For clownshoe noises
 	//deny_client_move=1 // HONK // Doesn't work right yet
+
+	meat_type = null
 
 	stop_automated_movement_when_pulled = 1
 	maxHealth = 30
@@ -127,14 +129,14 @@
 								target_mob = M
 								break
 					if (target_mob)
-						emote("honks menacingly at [target_mob]")
+						emote("me",,"honks menacingly at [target_mob]")
 
 				if(CLOWN_STANCE_ATTACK)	//This one should only be active for one tick
 					stop_automated_movement = 1
 					if(!target_mob || SA_attackable(target_mob))
 						stance = CLOWN_STANCE_IDLE
 					if(target_mob in view(7,src))
-						walk_to(src, target_mob, 1, 3)
+						start_walk_to(target_mob, 1, 3)
 						stance = CLOWN_STANCE_ATTACKING
 
 				if(CLOWN_STANCE_ATTACKING)
@@ -215,7 +217,7 @@
 /mob/living/simple_animal/hostile/retaliate/cluwne/attack_animal(mob/living/simple_animal/M as mob)
 	alertMode()
 	if(M.melee_damage_upper <= 0)
-		M.emote("[M.friendly] \the <EM>[src]</EM>")
+		M.emote("me",,"[M.friendly] \the <EM>[src]</EM>")
 	else
 		if(M.attack_sound)
 			playsound(loc, M.attack_sound, 50, 1, 1)
@@ -229,7 +231,7 @@
 /mob/living/simple_animal/hostile/retaliate/cluwne/attack_alien(mob/living/carbon/alien/humanoid/M as mob)
 	alertMode()
 	if(M.melee_damage_upper <= 0)
-		M.emote("[M.friendly] \the <EM>[src]</EM>")
+		M.emote("me",,"[M.friendly] \the <EM>[src]</EM>")
 	else
 		if(M.attack_sound)
 			playsound(loc, M.attack_sound, 50, 1, 1)
@@ -246,11 +248,16 @@
 		var/mob/living/L = target
 		if(prob(10))
 			L.Knockdown(5)
+			L.Stun(5)
 			L.visible_message("<span class='danger'>\The [src.name] slips \the [L.name]!</span>")
 			return
 	return ..()
 
 /mob/living/simple_animal/hostile/retaliate/cluwne/attackby(var/obj/item/O as obj, var/mob/user as mob)
+	var/currenthealth = health
+	..()
+	playsound(src, 'sound/items/bikehorn.ogg', 50, 1)
+	health = currenthealth
 	//only knowledge can kill a cluwne
 	if(istype(O,/obj/item/weapon/book))
 		gib()
@@ -296,7 +303,7 @@
 		return //under effects of time magick
 
 	var/msg = pick("quietly sobs into a dirty handkerchief","cries into [gender==MALE?"his":"her"] hands","bawls like a cow")
-	return ..(msg)
+	return ..("me", type, "[msg].")
 
 /mob/living/simple_animal/hostile/retaliate/cluwne/Move(NewLoc, Dir = 0, step_x = 0, step_y = 0, glide_size_override = 0)
 	. = ..()

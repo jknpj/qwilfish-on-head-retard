@@ -127,7 +127,7 @@
 	user.make_invisible(INVISIBLEPOTION, time, include_clothes)
 
 /obj/item/potion/invisibility/impact_atom(atom/target)
-	if(isatommovable(target))
+	if(ismovable(target))
 		var/atom/movable/AM = target
 		AM.make_invisible(INVISIBLEPOTION, time)
 
@@ -245,7 +245,7 @@
 	var/list/L = get_all_mobs_in_dview(get_turf(src))
 	for(var/mob/living/carbon/human/H in L)
 		if(H.isDeadorDying())
-			if(prob(50) && isjusthuman(H))
+			if(isjusthuman(H))
 				H.make_zombie(M)
 			else
 				new /mob/living/simple_animal/hostile/necro/skeleton(get_turf(H), M, H.mind)
@@ -273,7 +273,7 @@
 		user.alphas -= TRANSPARENCYPOTION
 
 /obj/item/potion/transparency/impact_atom(atom/target)
-	if(!isatommovable(target))
+	if(!ismovable(target))
 		return
 	target.alpha = 125
 	spawn(10 MINUTES)

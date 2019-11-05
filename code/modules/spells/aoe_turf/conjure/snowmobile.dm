@@ -7,11 +7,11 @@
 	charge_max = 1
 	school = "conjuration"
 	spell_flags = Z2NOCAST
-	invocation = "How much did Santa pay for his sleigh? Nothing, it was on the house!"
+	invocation = "SL'IGH B'LLS RIN'!"
 	invocation_type = SpI_SHOUT
 	range = 0
 
-	summon_type = list(/obj/structure/bed/chair/vehicle/wizmobile/santa)
+	summon_type = list(/obj/structure/bed/chair/vehicle/firebird/santa)
 	duration = 0
 
 	hud_state = "snowmobile"

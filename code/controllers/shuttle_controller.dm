@@ -6,6 +6,7 @@
 #define SHUTTLEARRIVETIME  600		// 10 minutes = 600 seconds
 #define SHUTTLELEAVETIME   180		// 3 minutes = 180 seconds
 #define SHUTTLETRANSITTIME 120		// 2 minutes = 120 seconds
+#define SHUTTLEGRACEPERIOD 300      // time after roundstart until the shuttle can be called, 5 minutes = 300 seconds
 
 var/global/datum/emergency_shuttle/emergency_shuttle
 
@@ -37,16 +38,12 @@ datum/emergency_shuttle
 
 	var/warmup_sound = 0
 
+	var/was_early_launched = FALSE //had timer shortened to 10 seconds
+
 	// call the shuttle
 	// if not called before, set the endtime to T+600 seconds
 	// otherwise if outgoing, switch to incoming
 
-datum/emergency_shuttle/proc/init()
-	var/list/pods_to_test = list ("1","2","3","5")//ADD NEW PODS HERE
-	for (var/i in pods_to_test)
-		var/area/pod_test = locate(text2path("/area/shuttle/escape_pod[i]/station"))
-		if (is_area_in_map(pod_test))
-			escape_pods[i] = "station"
 datum/emergency_shuttle/proc/incall(coeff = 1)
 	if(shutdown)
 		return
@@ -100,7 +97,7 @@ datum/emergency_shuttle/proc/recall()
 // note if direction = -1, gives a count-up to SHUTTLEARRIVETIME
 datum/emergency_shuttle/proc/timeleft()
 	if(online)
-		var/timeleft = round((endtime - world.timeofday)/10 ,1)
+		var/timeleft = round((endtime - world.time)/10 ,1)
 		if(direction >= 0)
 			return timeleft
 		else
@@ -110,7 +107,7 @@ datum/emergency_shuttle/proc/timeleft()
 
 // sets the time left to a given delay (in seconds)
 datum/emergency_shuttle/proc/settimeleft(var/delay)
-	endtime = world.timeofday + delay * 10
+	endtime = world.time + delay * 10
 	timelimit = delay
 
 // sets the shuttle direction
@@ -121,42 +118,31 @@ datum/emergency_shuttle/proc/setdirection(var/dirn)
 		return
 	direction = dirn
 	// if changing direction, flip the timeleft by SHUTTLEARRIVETIME, unless changing from/to 0
-	var/ticksleft = endtime - world.timeofday
-	endtime = world.timeofday + (SHUTTLEARRIVETIME*10 - ticksleft)
+	var/ticksleft = endtime - world.time
+	endtime = world.time + (SHUTTLEARRIVETIME*10 - ticksleft)
 	return
 
 datum/emergency_shuttle/proc/move_pod(var/pod,var/destination)
-	if (!pod || !destination)
+	if (!pod || !destination || !(istype(pod, /datum/shuttle/escape)) || !escape_pods.Find(pod))
 		return
-	var/area/start_location=locate(text2path("/area/shuttle/escape_pod[pod]/[escape_pods[pod]]"))
-	var/area/end_location=locate(text2path("/area/shuttle/escape_pod[pod]/[destination]"))
 
-	for(var/obj/structure/shuttle/engine/propulsion/P in start_location)
-		spawn()
-			P.shoot_exhaust()
-
-	start_location.move_contents_to(end_location, null, NORTH)
-
-	escape_pods[pod] = destination
-
-	for(var/obj/machinery/door/D in all_doors)
-		if (get_area(D) == end_location)
-			spawn(0)
-				if(destination == "transit")
-					D.close()
-				else
-					D.open()
-
-	for(var/mob/M in end_location)
-		if (M.client)
-			spawn()
-				if (M.locked_to)
-					shake_camera(M, 4, 1) // locked_to, not a lot of shaking
-				else
-					shake_camera(M, 10, 2) // unlocked_to, HOLY SHIT SHAKE THE ROOM
-		if (istype(M, /mob/living/carbon))
-			if (!M.locked_to)
-				M.Knockdown(5)
+	var/datum/shuttle/escape/S = pod
+	switch(destination)
+		if("station")
+			if(!S.move_to_dock(S.dock_station, 0))
+				message_admins("Warning: [S] failed to move to station.")
+		if("centcom")
+			if(!S.move_to_dock(S.dock_centcom, 0))
+				message_admins("Warning: [S] failed to move to centcom.")
+		if("transit")
+			if(!S.move_to_dock(S.transit_port, 0))
+				message_admins("Warning: [S] failed to move to transit.")
+	spawn()
+		for(var/obj/machinery/door/D in S.linked_area)
+			if(destination == "transit")
+				D.close()
+			else
+				D.open()
 
 datum/emergency_shuttle/proc/force_shutdown()
 	online=0
@@ -242,6 +228,9 @@ datum/emergency_shuttle/proc/shuttle_phase(var/phase, var/casual = 1)
 				send2maindiscord("The **Emergency Shuttle** has docked with the station.")
 				captain_announce("The Emergency Shuttle has docked with the station. You have [round(timeleft()/60,1)] minutes to board the Emergency Shuttle.")
 				world << sound('sound/AI/shuttledock.ogg')
+			if(ticker)
+				ticker.shuttledocked_time = world.time / 10
+				ticker.mode.ShuttleDocked(1)
 				/*
 				if(universe.name == "Hell Rising")
 					to_chat(world, "___________________________________________________________________")
@@ -290,6 +279,9 @@ datum/emergency_shuttle/proc/shuttle_phase(var/phase, var/casual = 1)
 			else
 				vote_preload()
 				location = 2
+
+			if(ticker)
+				ticker.mode.ShuttleDocked(2)
 
 			if(shuttle && istype(shuttle,/datum/shuttle/escape))
 				var/datum/shuttle/escape/E = shuttle
@@ -393,3 +385,16 @@ datum/emergency_shuttle/proc/process()
 
 		else
 			return 1
+
+/proc/shuttle_autocall()
+	if (emergency_shuttle.departed)
+		return
+
+	if (emergency_shuttle.location == SHUTTLE_ON_STATION)
+		return
+
+	emergency_shuttle.incall(2)
+	log_game("All the AIs, comm consoles and boards are destroyed. Shuttle called.")
+	message_admins("All the AIs, comm consoles and boards are destroyed. Shuttle called.", 1)
+	captain_announce("The emergency shuttle has been called. It will arrive in [round(emergency_shuttle.timeleft()/60)] minutes.")
+	world << sound('sound/AI/shuttlecalled.ogg')

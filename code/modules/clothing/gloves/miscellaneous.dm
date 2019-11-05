@@ -60,6 +60,7 @@
 	permeability_coefficient = 0.01
 	_color = "medical"				//matches cmo stamp
 	species_fit = list(VOX_SHAPED)
+	sterility = 100
 
 /obj/item/clothing/gloves/botanic_leather
 	desc = "These leather gloves protect against thorns, barbs, prickles, spikes and other harmful objects of floral origin."
@@ -336,3 +337,24 @@
 		P2.owner = user
 		P1.teleport(user)
 
+/obj/item/clothing/gloves/mining
+	name = "fists of the rockernaut"
+	desc = "Start 'em up and rock and roll!"
+	icon_state = "rockernaut_gloves"
+	item_state = "rockernaut_gloves"
+	damage_added = 5
+	hitsound_added = 'sound/weapons/heavysmash.ogg'
+
+/obj/item/clothing/gloves/mining/dexterity_check()
+	return FALSE
+
+/obj/item/clothing/gloves/mining/Touch(var/atom/A, mob/user, proximity)
+	if(proximity && istype(A, /turf/unsimulated/mineral))
+		var/turf/unsimulated/mineral/M = A
+		if(do_after(user, A, max(M.minimum_mine_time,4 SECONDS*M.mining_difficulty)))
+			playsound(get_turf(src), hitsound_added, 100, 1, vary = 0)
+			user.do_attack_animation(M, src)
+			M.GetDrilled(0)
+
+/obj/item/clothing/gloves/mining/attack_icon()
+	return image(icon = 'icons/mob/attackanims.dmi', icon_state = "rockernaut")

@@ -55,8 +55,8 @@
 /obj/item/weapon/bananapeel/traitorpeel
 	name = "banana peel"
 	desc = "A peel from a banana."
-	icon = 'icons/obj/items.dmi'
-	icon_state = "banana_peel"
+	icon = 'icons/obj/hydroponics/banana.dmi'
+	icon_state = "peel"
 	item_state = "banana_peel"
 	w_class = W_CLASS_TINY
 	throwforce = 0
@@ -75,7 +75,7 @@
 				"<span class='userdanger'>They're eating your back!</span>")
 			return
 		if(ishuman(M))
-			if(M.CheckSlip() < 1)
+			if(M.CheckSlip() != TRUE)
 				return
 			else
 				M.simple_message("<span class='warning'>Your feet feel like they're on fire!</span>",\
@@ -94,6 +94,7 @@
 				"<span class='userdanger'>Please, just end the pain!</span>")
 			playsound(src, 'sound/misc/slip.ogg', 50, 1, -3)
 			M.Knockdown(10)
+			M.Stun(10)
 			M.take_overall_damage(0, burned)
 
 /obj/item/weapon/bananapeel/traitorpeel/throw_impact(atom/hit_atom)

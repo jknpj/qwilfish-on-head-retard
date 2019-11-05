@@ -45,40 +45,16 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 	var/obj/item/tool_state = null
 	var/obj/item/head_state = null
 
-
-/mob/living/silicon/robot/mommi/pick_module(var/forced_module = null)
-	if(module)
-		return
-
-	if(forced_module)
-		modtype = forced_module
-	else
-		if(mommi_modules.len)
-			modtype = input("Please, select a module!", "Nanotrasen", null, null) as null|anything in mommi_modules
-		else
-			modtype=modules[0]
-
-	if(module)
-		return
-	if(!(modtype in mommi_modules))
-		return
-
-	var/module_type = mommi_modules[modtype]
-	module = new module_type(src)
-
-	feedback_inc("cyborg_[lowertext(modtype)]",1)
-	updatename()
-
-	set_module_sprites(module.sprites)
-
-	choose_icon()
-
-	SetEmagged(emagged) // Update emag status and give/take emag modules away
+/mob/living/silicon/robot/mommi/getModules()
+	return mommi_modules //Default non-subtype mommis aren't supposed to spawn outside of bus anyways
 
 //REMOVE STATIC
 /mob/living/silicon/robot/mommi/Destroy()
 	remove_static_overlays()
 	..()
+
+/mob/living/silicon/robot/mommi/track_globally()
+	return //don't track
 
 /mob/living/silicon/robot/mommi/remove_screen_objs()
 	..()
@@ -112,6 +88,10 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 	//If KEEPER is enabled, disable it.
 	if(keeper)
 		keeper = FALSE
+
+	//and maybe some more freedoms like staying up past bedtime, littering, and jaywalking :)
+	if(!HAS_MODULE_QUIRK(src, MODULE_CAN_HANDLE_FOOD))
+		module.quirk_flags |= MODULE_CAN_HANDLE_FOOD
 
 /mob/living/silicon/robot/mommi/attackby(obj/item/weapon/W, mob/living/user)
 	if(istype(W, /obj/item/stack/cable_coil) && wiresexposed)
@@ -171,12 +151,12 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 		else
 			to_chat(user, "You can't reach the wiring.")
 
-	else if(isscrewdriver(W) && opened && !cell)	// haxing
+	else if(W.is_screwdriver(user) && opened && !cell)	// haxing
 		wiresexposed = !wiresexposed
 		to_chat(user, "The wires have been [wiresexposed ? "exposed" : "unexposed"].")
 		updateicon()
 
-	else if(isscrewdriver(W) && opened && cell)	// radio
+	else if(W.is_screwdriver(user) && opened && cell)	// radio
 		if(radio)
 			radio.attackby(W,user)//Push it to the radio to let it handle everything
 		else
@@ -254,9 +234,6 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 		picked_icon = TRUE
 
 /mob/living/silicon/robot/mommi/installed_modules()
-	if(weapon_lock)
-		to_chat(src, "<span class='warning'>Weapon lock active, unable to use modules! Count:[weaponlock_time]</span>")
-		return
 	if(!module)
 		pick_module()
 		return
@@ -293,7 +270,7 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 
 
 /mob/living/silicon/robot/mommi/Topic(href, href_list)
-	..()
+	. = ..()
 	if(usr && (src != usr))
 		return
 
@@ -339,8 +316,3 @@ They can only use one tool at a time, they can't choose modules, and they have 1
 
 /mob/living/silicon/robot/mommi/radio_menu()
 	radio.interact(src)//Just use the radio's Topic() instead of bullshit special-snowflake code
-
-//Nanotrasen MoMMI subtype because we don't give mommis a choice of choosing their module.
-/mob/living/silicon/robot/mommi/nt/New()
-	pick_module("Nanotrasen")
-	..()

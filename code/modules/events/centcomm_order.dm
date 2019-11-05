@@ -2,6 +2,8 @@
 
 /datum/event/centcomm_order
 
+/datum/event/centcomm_order/can_start()
+	return 25
 
 /datum/event/centcomm_order/start()
 	var/datum/centcomm_order/C = new
@@ -132,4 +134,4 @@
 	C.requested = product
 	C.worth = value
 	C.acct_by_string = department
-	supply_shuttle.add_centcomm_order(C)
+	SSsupply_shuttle.add_centcomm_order(C)

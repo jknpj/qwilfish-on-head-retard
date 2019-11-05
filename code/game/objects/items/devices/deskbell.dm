@@ -79,6 +79,7 @@
 
 /obj/item/device/deskbell/attack_hand(var/mob/user)
 	if(anchored)
+		disease_contact(user,HANDS)
 		ring()
 	add_fingerprint(user)
 	return
@@ -91,14 +92,16 @@
 		return 1
 	return 0
 
-/obj/item/device/deskbell/MouseDrop(mob/user as mob)
+/obj/item/device/deskbell/MouseDropFrom(mob/user as mob)
 	if(user == usr && !usr.incapacitated() && (usr.contents.Find(src) || in_range(src, usr)))
 		if(istype(user, /mob/living/carbon/human) || istype(user, /mob/living/carbon/monkey))
 			if(anchored)
 				to_chat(user, "You must undo the securing bolts before you can pick it up.")
 				return
 			if( !user.get_active_hand() )		//if active hand is empty
-				src.forceMove(user)
+				if(istype(loc, /obj/item/weapon/storage))
+					var/obj/item/weapon/storage/bag = loc
+					bag.remove_from_storage(src)
 				user.put_in_hands(src)
 				user.visible_message("<span class='notice'>[user] picks up the [src].</span>", "<span class='notice'>You grab [src] from the floor!</span>")
 

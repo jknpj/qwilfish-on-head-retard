@@ -234,3 +234,6 @@
 //Obj
 #define SA_OBJ_BUCKLED /obj/abstract/screen/alert/buckled
 #define SA_OBJ_HANDCUFFS /obj/abstract/screen/alert/handcuffed
+//Cult HUD
+#define ui_cult_Act "WEST+0:[6*PIXEL_MULTIPLIER],SOUTH+5:[15*PIXEL_MULTIPLIER]"
+#define ui_cult_tattoos "WEST+0:[6*PIXEL_MULTIPLIER], SOUTH+4:[13*PIXEL_MULTIPLIER]"

@@ -7,6 +7,8 @@
 				. = src.unwield(user)
 			else
 				. = src.wield(user)
+	if(material_type)
+		material_type.on_use(src, user, user)
 
 // No comment
 /atom/proc/attackby(obj/item/W, mob/user)
@@ -16,20 +18,27 @@
 	if(W && !(W.flags&NO_ATTACK_MSG))
 		user.do_attack_animation(src, W)
 		visible_message("<span class='danger'>[src] has been hit by [user] with [W].</span>")
+	if(W.material_type)
+		W.material_type.on_use(W, src, user)
 
-/mob/living/attackby(obj/item/I, mob/user, var/no_delay = 0, var/originator = null)
+/mob/living/attackby(obj/item/I, mob/user, var/no_delay = 0, var/originator = null, var/def_zone = null)
 	if(!no_delay)
 		user.delayNextAttack(10)
 	if(istype(I) && ismob(user))
 		if(originator)
-			I.attack(src, user, null, originator)
+			I.attack(src, user, def_zone, originator)
 		else
-			I.attack(src, user)
+			I.attack(src, user, def_zone)
+	if(BrainContainer)
+		BrainContainer.SendSignal(COMSIG_ATTACKEDBY, list("assailant"=user,"damage"=I.force))
+
 
 
 // Proximity_flag is 1 if this afterattack was called on something adjacent, in your square, or on your person.
 // Click parameters is the params string from byond Click() code, see that documentation.
 /obj/item/proc/afterattack(atom/target, mob/user, proximity_flag, click_parameters)
+	if(daemon && daemon.flags & DAEMON_AFTATT)
+		daemon.afterattack(target, user, proximity_flag, click_parameters)
 	return
 
 // Overrides the weapon attack so it can attack any atoms like when we want to have an effect on an object independent of attackby
@@ -40,9 +49,9 @@
 
 obj/item/proc/get_clamped_volume()
 	if(src.force && src.w_class)
-		return Clamp((src.force + src.w_class) * 4, 30, 100)// Add the item's force to its weight class and multiply by 4, then clamp the value between 30 and 100
+		return clamp((src.force + src.w_class) * 4, 30, 100)// Add the item's force to its weight class and multiply by 4, then clamp the value between 30 and 100
 	else if(!src.force && src.w_class)
-		return Clamp(src.w_class * 6, 10, 100) // Multiply the item's weight class by 6, then clamp the value between 10 and 100
+		return clamp(src.w_class * 6, 10, 100) // Multiply the item's weight class by 6, then clamp the value between 10 and 100
 
 /obj/item/proc/attack(mob/living/M as mob, mob/living/user as mob, def_zone, var/originator = null)
 	if(restraint_resist_time > 0)
@@ -200,7 +209,7 @@ obj/item/proc/get_clamped_volume()
 				else
 					to_chat(user, "<span class='warning'>You attack [M] with [I]!</span>")
 
-
+	I.on_attack(M,user)
 	if(istype(M, /mob/living/carbon))
 		var/mob/living/carbon/C = M
 		if(originator)
@@ -233,5 +242,12 @@ obj/item/proc/get_clamped_volume()
 		M.updatehealth()
 	I.add_fingerprint(user)
 
+
+/obj/item/proc/on_attack(var/atom/attacked, var/mob/user)
+	if (!user.gcDestroyed)
+		user.do_attack_animation(attacked, src)
+		user.delayNextAttack(attack_delay)
 	if(hitsound)
-		playsound(M.loc, I.hitsound, 50, 1, -1)
+		playsound(attacked.loc, hitsound, 50, 1, -1)
+	if(material_type)
+		material_type.on_use(src,attacked, user)

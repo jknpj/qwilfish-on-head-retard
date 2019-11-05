@@ -571,7 +571,7 @@ Status: []<BR>"},
 
 			if (E.fields["name"] == perpname)
 				for (var/datum/data/record/R in data_core.security)
-					if ((R.fields["id"] == E.fields["id"]) && (R.fields["criminal"] == "*Arrest*"))
+					if ((R.fields["id"] == E.fields["id"]) && (R.fields["criminal"] == "*Arrest*" || R.fields["criminal"] == "*High Threat*"))
 						threatcount = PERP_LEVEL_ARREST
 						break
 
@@ -691,17 +691,10 @@ Status: []<BR>"},
 				build_step = 3
 				return
 
-			else if(istype(W, /obj/item/weapon/weldingtool))
+			else if(iswelder(W))
 				var/obj/item/weapon/weldingtool/WT = W
-				if(!WT.isOn())
-					return
-				if (WT.get_fuel() < 5) // uses up 5 fuel.
-					to_chat(user, "<span class='warning'>You need more fuel to complete this task.</span>")
-					return
-
-				playsound(src, pick('sound/items/Welder.ogg', 'sound/items/Welder2.ogg'), 50, 1)
-				if(do_after(user, src, 20))
-					if(!src || !WT.remove_fuel(5, user))
+				if (WT.do_weld(user, src, 20, 5))
+					if(gcDestroyed)
 						return
 					build_step = 1
 					to_chat(user, "You remove the turret's interior metal armor.")
@@ -741,7 +734,7 @@ Status: []<BR>"},
 			// attack_hand() removes the gun
 
 		if(5)
-			if(isscrewdriver(W))
+			if(W.is_screwdriver(user))
 				playsound(src, 'sound/items/Screwdriver.ogg', 100, 1)
 				build_step = 6
 				to_chat(user, "<span class='notice'>You close the internal access hatch.</span>")
@@ -760,7 +753,7 @@ Status: []<BR>"},
 					to_chat(user, "<span class='warning'>You need at least 2 [stack] to add external armor.</span>")
 					return
 
-			else if(isscrewdriver(W))
+			else if(W.is_screwdriver(user))
 				playsound(src, 'sound/items/Screwdriver.ogg', 100, 1)
 				build_step = 5
 				to_chat(user, "You open the internal access hatch.")
@@ -769,15 +762,7 @@ Status: []<BR>"},
 		if(7)
 			if(iswelder(W))
 				var/obj/item/weapon/weldingtool/WT = W
-				if(!WT.isOn())
-					return
-				if (WT.get_fuel() < 5)
-					to_chat(user, "<span class='warning'>You need more fuel to complete this task.</span>")
-
-				playsound(src, pick('sound/items/Welder.ogg', 'sound/items/Welder2.ogg'), 50, 1)
-				if(do_after(user, src, 30))
-					if(!src || !WT.remove_fuel(5, user))
-						return
+				if(WT.do_weld(user, src, 30,5))
 					build_step = 8
 					to_chat(user, "<span class='notice'>You weld the turret's armor down.</span>")
 
@@ -861,6 +846,6 @@ Status: []<BR>"},
 /obj/machinery/porta_turret/stationary
 	emagged = 1
 
-	New()
-		installed = new/obj/item/weapon/gun/energy/laser(src)
-		..()
+/obj/machinery/porta_turret/stationary/New()
+	installed = new/obj/item/weapon/gun/energy/laser(src)
+	..()
