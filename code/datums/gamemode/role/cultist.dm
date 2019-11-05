@@ -211,7 +211,7 @@
 				M.gui_icons.soulblade_bgLEFT,
 				M.gui_icons.soulblade_coverLEFT,
 				M.gui_icons.soulblade_bloodbar,
-				M.fire,
+//				M.fire,
 				)
 
 /mob/living/carbon/proc/muted()

@@ -126,12 +126,9 @@
 	playsound(src, 'sound/misc/buckle_click.ogg', 50, 1)
 	add_fingerprint(user)
 
-<<<<<<< HEAD
-	lock_atom(M, lock_type)
-	M.throw_alert(SA_OBJ_BUCKLED, new_master = src)
-=======
 	lock_atom(M, mob_lock_type)
->>>>>>> 0917fb8db0c423346b5b89c63853ec3bd0d38165
+	M.throw_alert(SA_OBJ_BUCKLED, new_master = src)
+	
 
 	if(M.pulledby)
 		M.pulledby.start_pulling(src)

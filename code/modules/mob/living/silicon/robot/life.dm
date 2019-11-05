@@ -226,12 +226,12 @@
 	else
 		throw_alert(SCREEN_ALARM_CHARGE,SA_CELL_MISSING)
 
-	if(bodytemp) //actually environment temperature but fuck it
-		bodytemp.icon_state = "temp[temp_alert]"
-	if(pressure)
-		pressure.icon_state = "pressure[pressure_alert]"
-	if(album_icon)
-		album_icon.icon_state = "album[connected_ai ? "1":""]"
+//	if(bodytemp) //actually environment temperature but fuck it
+//		bodytemp.icon_state = "temp[temp_alert]"
+//	if(pressure)
+//		pressure.icon_state = "pressure[pressure_alert]"
+//	if(album_icon)
+//		album_icon.icon_state = "album[connected_ai ? "1":""]"
 
 	update_pull_icon()
 

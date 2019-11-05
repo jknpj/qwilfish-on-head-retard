@@ -8,36 +8,39 @@
 //For example, high pressure's id is "highpressure" and can be serverity 1 or 2 to get "highpressure1" or "highpressure2" as icon_states
 //new_master is optional and sets the alert's icon state to "template" in the ui_style icons with the master as an overlay.
 //Clicks are forwarded to master
-/mob/proc/throw_alert(category, type, severity, obj/new_master)
-	if(!category)
+/mob/proc/throw_alert(alert_type, severity, obj/new_master)
+	if(!alert_type || gcDestroyed)
 		return
 
 	var/obj/abstract/screen/alert/alert
-	if(alerts[category])
-		alert = alerts[category]
+	if(alerts[alert_type])
+		alert = alerts[alert_type]
 		if(new_master && new_master != alert.master)
-//			CRASH("[src] threw alert [category] with new_master [new_master] while already having that alert with master [alert.master]")
-			clear_alert(category)
+//			CRASH("[src] threw alert [alert_type] with new_master [new_master] while already having that alert with master [alert.master]")
+			clear_alert(alert_type)
 			return .()
-		else if(alert.type == type && (!severity || severity == alert.severity))
+		else if(alert.type == alert_type && (!severity || severity == alert.severity))
 			if(alert.timeout)
-				clear_alert(category)
+				clear_alert(alert_type)
 				return .()
 			return FALSE
 	else
-		alert = getFromPool(type)
+		alert = getFromPool(alert_type)
 
 	if(new_master)
 		var/old_layer = new_master.layer
+		var/old_plane = new_master.plane
 		new_master.layer = FLOAT_LAYER
+		new_master.plane = FLOAT_PLANE
 		alert.overlays += new_master
 		new_master.layer = old_layer
+		new_master.plane = old_plane
 		alert.icon_state = "template" // We'll set the icon to the client's ui pref in reorganize_alerts()
 		alert.master = new_master
 	else
 		alert.icon_state = "[initial(alert.icon_state)][severity]"
 
-	alerts[category] = alert
+	alerts[alert_type] = alert
 	if(client && hud_used)
 		hud_used.reorganize_alerts()
 	alert.transform = matrix(32, 6, MATRIX_TRANSLATE)
@@ -45,17 +48,17 @@
 
 	if(alert.timeout)
 		spawn(alert.timeout)
-			if(alert.timeout && alerts[category] == alert && world.time >= alert.timeout)
-				clear_alert(category)
+			if(alert.timeout && alerts[alert_type] == alert && world.time >= alert.timeout)
+				clear_alert(alert_type)
 		alert.timeout = world.time + alert.timeout - world.tick_lag
 	return alert
 
 // Proc to clear an existing alert.
-/mob/proc/clear_alert(category)
-	var/obj/abstract/screen/alert = alerts[category]
+/mob/proc/clear_alert(alert_type)
+	var/obj/abstract/screen/alert = alerts[alert_type]
 	if(!alert)
 		return FALSE
-	alerts -= category
+	alerts -= alert_type
 	if(client && hud_used)
 		hud_used.reorganize_alerts()
 	client.screen -= alert
@@ -145,7 +148,7 @@
 	name = "Buckled"
 	desc = "You've been buckled to something and can't move. Click the alert to unbuckle unless you're handcuffed."
 
-/obj/abstract/screen/alert/handcuffed // Not used right now.
+/obj/abstract/screen/alert/handcuffed
 	name = "Handcuffed"
 	desc = "You're handcuffed and can't act. If anyone drags you, you won't be able to move. Click the alert to free yourself."
 
@@ -179,9 +182,6 @@
 		mymob.client.screen |= alert
 	return TRUE
 
-/mob
-	var/list/alerts = list() // contains /obj/abstract/screen only // On /mob so clientless mobs will throw alerts properly
-
 /obj/abstract/screen/alert/Click(location, control, params)
 	if(!usr || !usr.client)
 		return
@@ -194,6 +194,9 @@
 
 /obj/abstract/screen/alert/MouseEntered(location,control,params)
 	openToolTip(usr,src,params,title = name,content = desc)
+
+/obj/abstract/screen/alert/MouseExited()
+	closeToolTip(usr)
 
 /obj/abstract/screen/alert/Destroy()
 	severity = 0

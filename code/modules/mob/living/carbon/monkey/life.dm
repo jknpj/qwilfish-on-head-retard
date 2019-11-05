@@ -320,13 +320,8 @@
 					ratio = 0
 		if(ratio)
 			if(reagents)
-<<<<<<< HEAD
-				reagents.add_reagent(PLASMA, Clamp(ratio, MIN_PLASMA_DAMAGE, MAX_PLASMA_DAMAGE))
-			throw_alert(SA_TOXINS)
-=======
 				reagents.add_reagent(PLASMA, clamp(ratio, MIN_PLASMA_DAMAGE, MAX_PLASMA_DAMAGE))
-			toxins_alert = max(toxins_alert, 1)
->>>>>>> 0917fb8db0c423346b5b89c63853ec3bd0d38165
+			throw_alert(SA_TOXINS)
 	else
 		clear_alert(SA_TOXINS)
 
@@ -345,10 +340,7 @@
 			to_chat(src, "<span class='warning'>You feel a searing heat in your lungs!</span>")
 		throw_alert(SCREEN_ALARM_TEMPERATURE,SA_HEAT,1)
 	else
-<<<<<<< HEAD
 		clear_alert(SCREEN_ALARM_TEMPERATURE)
-=======
-		fire_alert = 0
 
 	//breathing diseases
 	var/block = 0
@@ -365,7 +357,6 @@
 		breath_airborne_diseases()
 
 	//Temporary fixes to the alerts.
->>>>>>> 0917fb8db0c423346b5b89c63853ec3bd0d38165
 
 	return 1
 

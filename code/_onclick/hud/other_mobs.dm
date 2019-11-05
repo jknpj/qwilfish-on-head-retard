@@ -106,11 +106,11 @@
 	mymob.gui_icons.soulblade_bloodbar.name = "Blood"
 	mymob.gui_icons.soulblade_bloodbar.screen_loc = ui_blob_powerbar
 
-	mymob.fire = getFromPool(/obj/abstract/screen)
-	mymob.fire.icon = 'icons/mob/screen1_shade.dmi'
-	mymob.fire.icon_state = "blade_ok"
-	mymob.fire.name = "blade integrity"
-	mymob.fire.screen_loc = ui_construct_fire
+//	mymob.fire = getFromPool(/obj/abstract/screen)
+//	mymob.fire.icon = 'icons/mob/screen1_shade.dmi'
+//	mymob.fire.icon_state = "blade_ok"
+//	mymob.fire.name = "blade integrity"
+//	mymob.fire.screen_loc = ui_construct_fire
 	///////////////////////////////////////
 
 	mymob.client.reset_screen()
@@ -118,11 +118,11 @@
 	mymob.client.screen += list(mymob.healths, mymob.pullin, mymob.zone_sel, mymob.purged)
 
 /datum/hud/proc/borer_hud()
-	mymob.fire = getFromPool(/obj/abstract/screen)
-	mymob.fire.icon = 'icons/mob/screen1_borer.dmi'
-	mymob.fire.icon_state = "fire0"
-	mymob.fire.name = "fire"
-	mymob.fire.screen_loc = ui_fire
+//	mymob.fire = getFromPool(/obj/abstract/screen)
+//	mymob.fire.icon = 'icons/mob/screen1_borer.dmi'
+//	mymob.fire.icon_state = "fire0"
+//	mymob.fire.name = "fire"
+//	mymob.fire.screen_loc = ui_fire
 
 	mymob.healths = getFromPool(/obj/abstract/screen)
 	mymob.healths.icon = 'icons/mob/screen1_borer.dmi'
@@ -137,7 +137,7 @@
 
 	mymob.client.reset_screen()
 
-	mymob.client.screen += list(mymob.healths, mymob.zone_sel, mymob.fire)
+	mymob.client.screen += list(mymob.healths, mymob.zone_sel)
 
 /datum/hud/proc/construct_hud()
 	var/constructtype

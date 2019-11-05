@@ -4,6 +4,7 @@
 /mob
 	plane = MOB_PLANE
 	var/said_last_words = 0 // All mobs can now whisper as they die
+	var/list/alerts = list() // contains /obj/abstract/screen only // On /mob so clientless mobs will throw alerts properly
 
 /mob/variable_edited(var_name, old_value, new_value)
 	.=..()
