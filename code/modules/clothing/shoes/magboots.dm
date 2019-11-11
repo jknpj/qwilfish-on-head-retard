@@ -225,3 +225,12 @@
 	funk_level = 0
 	canremove = 1
 	clothing_flags &= ~(NOSLIP | MAGPULSE)
+
+/obj/item/clothing/shoes/magboots/captain/sundowner
+	name = "red sun boots"
+	desc = "Desperado Enforcement LLC custom exoskeleton serial number 978-AZQEE."
+	icon_state = "sundowner_boots0"
+	base_state = "sundowner_boots"
+	mag_slow = MAGBOOTS_SLOWDOWN_LOW
+
+	

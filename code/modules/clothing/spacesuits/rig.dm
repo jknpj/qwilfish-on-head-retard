@@ -43,7 +43,7 @@
 		if(on) //The helmet light is currently on
 			on = 0 //Force it off
 			update_brightness() //Update as neccesary
-		actions_types.Remove(/datum/action/item_action/toggle_rig_light)//Disable the action button (which is only used to toggle the light, in theory)
+		actions_types &= ~/datum/action/item_action/toggle_rig_light//Disable the action button (which is only used to toggle the light, in theory)
 	else //We have a light
 		actions_types |= /datum/action/item_action/toggle_rig_light //Make sure we restore the action button
 
@@ -98,20 +98,30 @@
 	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECTION_TEMPERATURE
 	pressure_resistance = 200 * ONE_ATMOSPHERE
 	var/obj/item/clothing/head/helmet/space/rig/H = null
+	var/obj/item/clothing/shoes/magboots/B = null
+	var/boots_type = null
 	var/head_type = /obj/item/clothing/head/helmet/space/rig
 	var/obj/item/weapon/cell/cell = null
 	var/cell_type = /obj/item/weapon/cell/high //The cell_type we're actually using
 	var/list/modules = list()
-	actions_types = list(/datum/action/item_action/toggle_rig_helmet)
+	actions_types = list()
 
 /obj/item/clothing/suit/space/rig/New()
 	..()
-	cell = new cell_type
-	H = new head_type
+	if(cell_type)
+		cell = new cell_type
+	if(head_type)
+		actions_types |= /datum/action/item_action/toggle_rig_helmet
+		H = new head_type
+	if(boots_type)
+		actions_types |= /datum/action/item_action/toggle_rig_boots
+		B = new boots_type
+	initialize_actions()
 
 /obj/item/clothing/suit/space/rig/Destroy()
-	qdel(cell)
-	cell = null
+	if(cell)
+		qdel(cell)
+		cell = null
 	if(H && (H.loc == src || !H.loc))
 		qdel(H)
 	H = null
@@ -141,13 +151,36 @@
 			H = null
 			initialize_suit(user)
 	else
-		if(user.head && istype(user.head, head_type))
-			var/obj/I = user.head
-			to_chat(user, "<span class = 'notice'>\The [I] retracts into \the [src].</span>")
-			user.u_equip(I,0)
-			I.forceMove(src)
-			H = I
-			deactivate_suit(user)
+		if(user.head)
+			if(head_type && istype(user.head, head_type))
+				var/obj/I = user.head
+				to_chat(user, "<span class = 'notice'>\The [I] retracts into \the [src].</span>")
+				user.u_equip(I,0)
+				I.forceMove(src)
+				H = I
+				deactivate_suit(user)
+				return
+			to_chat(user, "<span class = 'notice'>\The [user.head] isn't compatible with \the [src].</span>")
+
+
+/obj/item/clothing/suit/space/rig/proc/toggle_boots(mob/living/carbon/human/user)
+	if(!user.is_wearing_item(src, slot_wear_suit))
+		return
+	if(H)
+		if(!user.shoes)
+			to_chat(user, "<span class = 'notice'>\The [H] extends from \the [src].</span>")
+			user.equip_to_slot(B, slot_shoes)
+			B = null
+	else
+		if(user.shoes)
+			if(boots_type && istype(user.shoes, boots_type))
+				var/obj/I = user.shoes
+				to_chat(user, "<span class = 'notice'>\The [I] retracts into \the [src].</span>")
+				user.u_equip(I,0)
+				I.forceMove(src)
+				B = I
+				return
+			to_chat(user, "<span class = 'notice'>\The [user.shoes] isn't compatible with \the [src].</span>")
 
 
 /obj/item/clothing/suit/space/rig/proc/initialize_suit(mob/user)
@@ -159,12 +192,11 @@
 		R.deactivate(user,src)
 
 /obj/item/clothing/suit/space/rig/attackby(obj/W, mob/user)
-	if(!H && istype(W, head_type) && user.drop_item(W, src, force_drop = 1))
+	if(head_type && !H && istype(W, head_type) && user.drop_item(W, src, force_drop = TRUE))
 		to_chat(user, "<span class = 'notice'>You attach \the [W] to \the [src].</span>")
 		H = W
 		return
 	..()
-
 
 //Chief Engineer's rig
 /obj/item/clothing/head/helmet/space/rig/elite
@@ -711,5 +743,35 @@
 	icon_state = "rig0-arch"
 	item_state = "arch_helm"
 	_color = "arch"
-	armor = list(melee = 40, bullet = 0, laser = 0,energy = 0, bomb = 65, bio = 100, rad = 50)
+	armor = list(melee = 40, bullet = 0, laser = 0,energy = 0, bomb = 65, bio = 0, rad = 0)
 	color_on = "#81F9C6" //Aquamarine. A combination of the colors from the lamp and rail light.
+
+/obj/item/clothing/head/helmet/space/rig/sundowner
+	name = "red sun helmet"
+	desc = "Desperado Enforcement LLC custom exoskeleton serial number 978-AZQEE."
+	icon_state = "sundowner_mask_0"
+	item_state = "sundowner_mask_0"
+	body_parts_covered = EARS | BEARD
+	armor = list(melee = 90, bullet = 90, laser = 0, energy = 0, bomb = 100, bio = 0, rad = 0)
+	_color = "sundowner_mask"
+	color_on = "#8B0000" //Dark red
+
+/obj/item/clothing/head/helmet/space/rig/sundowner/update_icon() //Temporary solution
+	icon_state = "[_color]_[on ? 2:0]"
+
+/obj/item/clothing/suit/space/rig/sundowner
+	name = "red sun exoskeleton"
+	desc = "Desperado Enforcement LLC custom exoskeleton serial number 978-AZQEE."
+	icon_state = "sundowner_suit"
+	item_state = "sundowner_suit"
+	body_parts_covered = FULL_TORSO | ARMS | HANDS | LEGS
+	armor = list(melee = 90, bullet = 90, laser = 0, energy = 0, bomb = 100, bio = 0, rad = 0)
+	head_type = /obj/item/clothing/head/helmet/space/rig/sundowner
+	boots_type = /obj/item/clothing/shoes/magboots/captain/sundowner
+
+/obj/item/clothing/suit/space/rig/sundowner/New()
+	..()
+	var/obj/item/rig_module/muscle_tissue/MT = new(src)
+	var/obj/item/rig_module/speed_boost/SB = new(src)
+	modules.Add(MT)
+	modules.Add(SB)

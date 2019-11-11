@@ -76,6 +76,9 @@
 
 /obj/item/New()
 	..()
+	initialize_actions()
+
+/obj/item/proc/initialize_actions()
 	for(var/path in actions_types)
 		new path(src)
 

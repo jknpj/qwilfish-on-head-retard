@@ -140,3 +140,9 @@
 	icon_state = "sundowner_coat_allblack"
 	item_state = "sundowner_coat_allblack"
 	siemens_coefficient = 0.6
+
+/obj/item/clothing/suit/armor/hos/sundowner/bloody
+	icon_state = "sundowner_coat"
+	item_state = "sundowner_coat"
+	armor = list(melee = 0, bullet = 0, laser = 100, energy = 0, bomb = 0, bio = 0, rad = 0)
+
