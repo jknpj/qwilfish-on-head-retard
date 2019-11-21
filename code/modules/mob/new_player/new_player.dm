@@ -377,9 +377,6 @@
 	if(rank == "Cyborg")
 		create_roundstart_cyborg()
 		return
-	if(rank == "Mobile MMI")
-		MoMMIfy()
-		return
 
 	var/mob/living/carbon/human/character = create_character()	//creates the human and transfers vars and mind
 	if(character.client.prefs.randomslot)
