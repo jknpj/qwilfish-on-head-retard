@@ -81,6 +81,7 @@ What is the naming convention for planes or layers?
 	#define WIRE_LAYER				6
 	#define VENT_BEZEL_LAYER		7
 	#define WIRE_TERMINAL_LAYER		8
+	#define PLATED_CATWALK_LAYER	9
 
 #define FLOOR_PLANE -2
 
