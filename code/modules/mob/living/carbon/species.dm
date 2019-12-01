@@ -40,6 +40,7 @@ var/global/list/whitelisted_species = list("Human")
 
 	var/primitive												// Lesser form, if any (ie. monkey for humans)
 	var/tail													// Name of tail image in species effects icon file.
+	var/ears
 	var/list/known_languages = list(LANGUAGE_GALACTIC_COMMON)	// Languages that this species innately knows.
 	var/default_language = LANGUAGE_GALACTIC_COMMON				// Default language is used when 'say' is used without modifiers.
 	var/attack_verb = "punches"									// Empty hand hurt intent verb.
@@ -1348,3 +1349,9 @@ var/list/has_died_as_golem = list()
 
 	H.drop_all()
 	qdel(src)
+
+/datum/species/human/felinid
+	name = "Felinid"
+	ears = "ears_cat"
+	tail = "tail_cat"
+	anatomy_flags = HAS_SKIN_TONE | HAS_LIPS | HAS_UNDERWEAR | HAS_SWEAT_GLANDS | HAS_TAIL | HAS_EARS
