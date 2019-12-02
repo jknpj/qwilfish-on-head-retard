@@ -1352,6 +1352,6 @@ var/list/has_died_as_golem = list()
 
 /datum/species/human/felinid
 	name = "Felinid"
-	ears = "ears_cat"
-	tail = "tail_cat"
+	ears = "nekomimi"
+	tail = "cat_tail"
 	anatomy_flags = HAS_SKIN_TONE | HAS_LIPS | HAS_UNDERWEAR | HAS_SWEAT_GLANDS | HAS_TAIL | HAS_EARS

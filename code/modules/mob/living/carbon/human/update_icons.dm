@@ -1216,7 +1216,7 @@ var/global/list/damage_icon_parts = list()
 			var/icon/tail_appearance = new/icon("icon" = 'icons/effects/species.dmi', icon_state = "[species.tail]_s")
 			if(species.ears)
 				tail_appearance.Blend(rgb(my_appearance.r_hair, my_appearance.g_hair, my_appearance.b_hair), ICON_ADD)
-			O.icon = tail_appearance
+			O.appearance = tail_appearance
 			obj_to_plane_overlay(O,TAIL_LAYER)
 
 	if(update_icons)
@@ -1246,10 +1246,13 @@ var/global/list/damage_icon_parts = list()
 			face_lying.Blend(hair_l, ICON_OVERLAY)
 
 	if(species && species.ears && species.anatomy_flags & HAS_EARS)
-		if(!head && !is_slot_hidden(head.body_parts_covered,HIDEHAIR))
-			var/icon/O = new/icon("icon" = 'icons/effects/species.dmi', icon_state = "[species.ears]_s")
-			O.Blend(rgb(my_appearance.r_hair, my_appearance.g_hair, my_appearance.b_hair), ICON_ADD)
-			face_lying.Blend(O, ICON_OVERLAY)
+		var/icon/ears_icon = new/icon("icon" = 'icons/effects/species.dmi', icon_state = "[species.ears]_s")
+		ears_icon.Blend(rgb(my_appearance.r_hair, my_appearance.g_hair, my_appearance.b_hair), ICON_ADD)
+		if(has_icon('icons/effects/species.dmi', "inner_[species.ears]_s"))
+			var/icon/earbit = new/icon("icon" = 'icons/effects/species.dmi', icon_state = "inner_[species.ears]_s")
+			ears_icon.Blend(earbit, ICON_OVERLAY)
+		face_lying.Blend(ears_icon, ICON_OVERLAY)
+
 	//Eyes
 	// Note: These used to be in update_face(), and the fact they're here will make it difficult to create a disembodied head
 	var/icon/eyes_l = new/icon('icons/mob/human_face.dmi', "eyes_l")
