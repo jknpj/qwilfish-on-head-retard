@@ -284,8 +284,8 @@ var/global/list/damage_icon_parts = list()
 
 
 	//Underwear
-	if(underwear >0 && underwear < 15 && species.anatomy_flags & HAS_UNDERWEAR)
-		if(!fat && !skeleton)
+	if(underwear && species.anatomy_flags & HAS_UNDERWEAR)
+		if(!fat && !skeleton && has_icon('icons/mob/human.dmi', "underwear[underwear]_[g]_s"))
 			stand_icon.Blend(new /icon('icons/mob/human.dmi', "underwear[underwear]_[g]_s"), ICON_OVERLAY)
 
 	if(update_icons)
@@ -296,7 +296,8 @@ var/global/list/damage_icon_parts = list()
 		stand_icon -= rgb(0,0,0,lowest_alpha)
 
 	//tail
-	update_tail_showing(0)
+	update_tail_showing()
+	update_ears_showing()
 
 
 //HAIR OVERLAY
@@ -349,6 +350,8 @@ var/global/list/damage_icon_parts = list()
 	O.icon = I
 	O.icon_state = I.icon_state
 	obj_to_plane_overlay(O,HAIR_LAYER)
+
+	update_ears_showing()
 
 	if(update_icons)
 		update_icons()
@@ -899,9 +902,8 @@ var/global/list/damage_icon_parts = list()
 		O.pixel_x = species.inventory_offsets["[slot_head]"]["pixel_x"] * PIXEL_MULTIPLIER
 		O.pixel_y = species.inventory_offsets["[slot_head]"]["pixel_y"] * PIXEL_MULTIPLIER
 		obj_to_plane_overlay(O,HEAD_LAYER)
-		//overlays_standing[HEAD_LAYER]	= standing
-	//else
-		//overlays_standing[HEAD_LAYER]	= null
+
+	update_ears_showing()
 
 	if(update_icons)
 		update_icons()
@@ -998,11 +1000,8 @@ var/global/list/damage_icon_parts = list()
 		O.pixel_x = species.inventory_offsets["[slot_wear_suit]"]["pixel_x"] * PIXEL_MULTIPLIER
 		O.pixel_y = species.inventory_offsets["[slot_wear_suit]"]["pixel_y"] * PIXEL_MULTIPLIER
 		obj_to_plane_overlay(O,SUIT_LAYER)
-		//overlays_standing[SUIT_LAYER]	= standing
-		update_tail_showing(0)
-	else
-		//overlays_standing[SUIT_LAYER]	= null
-		update_tail_showing(0)
+
+	update_tail_showing()
 
 	if(update_icons)
 		update_icons()
@@ -1208,19 +1207,29 @@ var/global/list/damage_icon_parts = list()
 /mob/living/carbon/human/update_inv_l_hand(var/update_icons=1)
 	return update_inv_hand(GRASP_LEFT_HAND, update_icons)
 
-/mob/living/carbon/human/proc/update_tail_showing(var/update_icons=1)
+/mob/living/carbon/human/proc/update_ears_showing()
+	overlays -= obj_overlays[EARS_LAYER]
+	if(species && species.ears && species.anatomy_flags & HAS_EARS)
+		if(!(head && head.body_parts_covered & HEAD))
+			var/obj/abstract/Overlays/O = obj_overlays[EARS_LAYER]
+			var/icon/ears_appearance = new /icon('icons/effects/species.dmi', species.ears)
+			ears_appearance.Blend(rgb(src.my_appearance.r_hair, src.my_appearance.g_hair, src.my_appearance.b_hair), ICON_ADD)
+			if(has_icon('icons/effects/species.dmi', "inner_[species.ears]"))
+				var/icon/earbit = new /icon('icons/effects/species.dmi', "inner_[species.ears]")
+				ears_appearance.Blend(earbit, ICON_OVERLAY)
+			O.appearance = ears_appearance
+			obj_to_plane_overlay(O,EARS_LAYER)
+
+/mob/living/carbon/human/proc/update_tail_showing()
 	overlays -= obj_overlays[TAIL_LAYER]
 	if(species && species.tail && species.anatomy_flags & HAS_TAIL)
 		if(!wear_suit || !is_slot_hidden(wear_suit.body_parts_covered,HIDEJUMPSUIT))
 			var/obj/abstract/Overlays/O = obj_overlays[TAIL_LAYER]
 			var/icon/tail_appearance = new/icon("icon" = 'icons/effects/species.dmi', icon_state = "[species.tail]_s")
 			if(species.ears)
-				tail_appearance.Blend(rgb(my_appearance.r_hair, my_appearance.g_hair, my_appearance.b_hair), ICON_ADD)
+				tail_appearance.Blend(rgb(src.my_appearance.r_hair, src.my_appearance.g_hair, src.my_appearance.b_hair), ICON_ADD)
 			O.appearance = tail_appearance
 			obj_to_plane_overlay(O,TAIL_LAYER)
-
-	if(update_icons)
-		update_icons()
 
 // Used mostly for creating head items
 /mob/living/carbon/human/proc/generate_head_icon()
@@ -1244,14 +1253,6 @@ var/global/list/damage_icon_parts = list()
 			var/icon/hair_l = new/icon("icon" = hair_style.icon, "icon_state" = "[hair_style.icon_state]_l")
 			hair_l.Blend(rgb(my_appearance.r_hair, my_appearance.g_hair, my_appearance.b_hair), ICON_ADD)
 			face_lying.Blend(hair_l, ICON_OVERLAY)
-
-	if(species && species.ears && species.anatomy_flags & HAS_EARS)
-		var/icon/ears_icon = new/icon("icon" = 'icons/effects/species.dmi', icon_state = "[species.ears]_s")
-		ears_icon.Blend(rgb(my_appearance.r_hair, my_appearance.g_hair, my_appearance.b_hair), ICON_ADD)
-		if(has_icon('icons/effects/species.dmi', "inner_[species.ears]_s"))
-			var/icon/earbit = new/icon("icon" = 'icons/effects/species.dmi', icon_state = "inner_[species.ears]_s")
-			ears_icon.Blend(earbit, ICON_OVERLAY)
-		face_lying.Blend(ears_icon, ICON_OVERLAY)
 
 	//Eyes
 	// Note: These used to be in update_face(), and the fact they're here will make it difficult to create a disembodied head

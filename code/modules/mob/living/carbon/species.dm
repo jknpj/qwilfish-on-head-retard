@@ -1352,6 +1352,35 @@ var/list/has_died_as_golem = list()
 
 /datum/species/human/felinid
 	name = "Felinid"
-	ears = "nekomimi"
+	ears = "cat_ears"
 	tail = "cat_tail"
+	gender = FEMALE
+
+	tox_mod = 2.5 // Stop giving chocolate to your cat, take it to the vet!
+	brute_mod = 0.9 // Catlike reflexes!
+
 	anatomy_flags = HAS_SKIN_TONE | HAS_LIPS | HAS_UNDERWEAR | HAS_SWEAT_GLANDS | HAS_TAIL | HAS_EARS
+	primitive = /mob/living/simple_animal/cat
+	has_organ = list(
+		"heart" =    /datum/organ/internal/heart,
+		"lungs" =    /datum/organ/internal/lungs,
+		"liver" =    /datum/organ/internal/liver,
+		"kidneys" =  /datum/organ/internal/kidney,
+		"brain" =    /datum/organ/internal/brain,
+		"appendix" = /datum/organ/internal/appendix,
+		"eyes" =     /datum/organ/internal/eyes/tajaran
+	)
+
+/datum/species/human/felinid/handle_speech(var/datum/speech/speech, mob/living/carbon/human/H)
+	var/static/regex/nya_lr = new("l|r", "g") //Hewwo
+	var/static/regex/nya_LR = new("L|R", "g") // FUCKING HEWW
+	var/static/regex/nya_n = new("(n\[aeiou])", "g") // I canyot bewieve you this
+	var/static/regex/nya_N = new("(N\[AEIOU])", "g") // Cany you nyot
+//	var/static/regex/nya_Nx = new("^NY") //Nyot wike you cawe
+	speech.message = nya_lr.Replace(speech.message, "w")
+	speech.message = nya_LR.Replace(speech.message, "W")
+	speech.message = nya_n.Replace(speech.message, "ny")
+	speech.message = nya_N.Replace(speech.message, "NY")
+//	speech.message = nya_Nx.Replace(speech.message, "Ny")
+
+	return ..()

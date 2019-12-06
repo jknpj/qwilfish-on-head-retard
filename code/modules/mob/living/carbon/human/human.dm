@@ -116,6 +116,15 @@
 	my_appearance.h_style = "Bald"
 	regenerate_icons()
 
+/mob/living/carbon/human/felinid/New(var/new_loc, delay_ready_dna = 0)
+	..(new_loc, "Felinid")
+	underwear = pick(16, 17)
+	my_appearance.r_hair = 0
+	my_appearance.g_hair = 255
+	my_appearance.b_hair = 157
+	my_appearance.h_style = random_hair_style(gender, "Felinid")
+	regenerate_icons()
+
 /mob/living/carbon/human/generate_static_overlay()
 	if(!istype(static_overlays,/list))
 		static_overlays = list()
@@ -195,6 +204,7 @@
 	//obj_overlays[HAND_LAYER]		= getFromPool(/obj/abstract/Overlays/hand_layer) //moved to human/update_inv_hand()
 	obj_overlays[TAIL_LAYER]		= getFromPool(/obj/abstract/Overlays/tail_layer)
 	obj_overlays[TARGETED_LAYER]	= getFromPool(/obj/abstract/Overlays/targeted_layer)
+	obj_overlays[EARS_LAYER]		= getFromPool(/obj/abstract/Overlays/ears_layer)
 
 	..()
 

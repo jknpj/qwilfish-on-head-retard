@@ -72,6 +72,9 @@
 /obj/abstract/Overlays/targeted_layer
 	layer = FLOAT_LAYER - (TOTAL_LAYERS - TARGETED_LAYER)
 
+/obj/abstract/Overlays/ears_layer
+	layer = FLOAT_LAYER - (TOTAL_LAYERS - EARS_LAYER)
+
 
 
 //Human Overlays Object variables
