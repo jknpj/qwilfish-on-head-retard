@@ -204,3 +204,10 @@
 
 /turf/simulated/wall/mineral/clockwork/clockworkify()
 	return
+
+/turf/simulated/wall/mineral/black_hull
+	name = "black hull"
+	desc = "It's surface is covered with heat-resistant material in areas likely to heat during reentry."
+	icon_state = "bswall"
+	walltype = "bswall"
+	mineral = "mauxite"

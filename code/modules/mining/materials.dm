@@ -441,6 +441,13 @@ var/global/list/initial_materials	//Stores all the matids = 0 in helping New
 	sheettype=/obj/item/bluespace_crystal
 	cointype=null
 
+/datum/material/mauxite
+	name="Mauxite"
+	id="mauxite"
+	value=5
+	oretype=/obj/item/stack/ore/mauxite
+	sheettype=/obj/item/stack/sheet/mineral/mauxite
+	cointype=null
 
 /* //Commented out to save save space in menus listing materials until they are used
 /datum/material/pharosium
@@ -512,16 +519,6 @@ var/global/list/initial_materials	//Stores all the matids = 0 in helping New
 	oretype=/obj/item/stack/ore/uqill
 	sheettype=/obj/item/stack/sheet/mineral/uqill
 	cointype=null
-
-
-/datum/material/mauxite
-	name="Mauxite"
-	id="mauxite"
-	value=5
-	oretype=/obj/item/stack/ore/mauxite
-	sheettype=/obj/item/stack/sheet/mineral/mauxite
-	cointype=null
-
 
 /datum/material/cobryl
 	name="Cobryl"

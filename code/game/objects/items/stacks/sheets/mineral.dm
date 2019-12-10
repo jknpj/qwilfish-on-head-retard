@@ -375,6 +375,17 @@ var/list/datum/stack_recipe/mythril_recipes = list ( \
 	..()
 
 
+/obj/item/stack/sheet/mineral/mauxite
+	name = "mauxite"
+	icon_state = "sheet-mauxite"
+	force = 5.0
+	throwforce = 5
+	w_class = W_CLASS_MEDIUM
+	throw_speed = 3
+	throw_range = 3
+	origin_tech = Tc_MATERIALS + "=5"
+	perunit = 3750
+
 /*
 /obj/item/stack/sheet/mineral/pharosium
 	name = "pharosium"
@@ -505,19 +516,6 @@ var/list/datum/stack_recipe/mythril_recipes = list ( \
 	throw_range = 3
 	origin_tech = Tc_MATERIALS + "=5"
 	perunit = 3750
-
-
-/obj/item/stack/sheet/mineral/mauxite
-	name = "mauxite"
-	icon_state = "sheet-mauxite"
-	force = 5.0
-	throwforce = 5
-	w_class = W_CLASS_MEDIUM
-	throw_speed = 3
-	throw_range = 3
-	origin_tech = Tc_MATERIALS + "=5"
-	perunit = 3750
-
 
 /obj/item/stack/sheet/mineral/molitz
 	name = "molitz"
