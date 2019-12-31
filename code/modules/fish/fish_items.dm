@@ -111,6 +111,15 @@ var/list/fish_items_list = list("goldfish" = /obj/item/weapon/fish/goldfish,
 	attack_verb = list("slapped", "humiliated", "hit", "rubbed")
 	hitsound = 'sound/effects/snap.ogg'
 	var/meat_type
+	var/weight = 1 // in lbs
+	var/length = 1 // in inches
+
+/obj/item/weapon/fish/New()
+	..()
+	//weight and length randomization: add or subtract up to half of the default value
+	var/R = rand() - 0.5
+	weight += round(weight*R)
+	length += round(weight*R)
 
 /obj/item/weapon/fish/glofish
 	name = "glofish"
@@ -126,6 +135,8 @@ var/list/fish_items_list = list("goldfish" = /obj/item/weapon/fish/goldfish,
 	name = "electric eel"
 	desc = "An eel capable of producing a mild electric shock. Luckily it's rather weak out of water."
 	icon_state = "electric_eel"
+	weight = 11
+	length = 38
 
 /obj/item/weapon/fish/shark
 	name = "shark"
@@ -133,6 +144,8 @@ var/list/fish_items_list = list("goldfish" = /obj/item/weapon/fish/goldfish,
 	icon_state = "shark"
 	hitsound = 'sound/weapons/bite.ogg'
 	force = 3
+	weight = 16
+	length = 11
 
 /obj/item/weapon/fish/shark/attackby(var/obj/item/O, var/mob/user)
 	if(istype(O, /obj/item/weapon/wirecutters))
@@ -148,6 +161,8 @@ var/list/fish_items_list = list("goldfish" = /obj/item/weapon/fish/goldfish,
 	desc = "Looks like someone ripped it's teeth out!"
 	icon_state = "shark"
 	hitsound = 'sound/effects/snap.ogg'
+	weight = 15
+	length = 11
 
 /obj/item/stack/teeth/shark
 	name = "shark teeth"
@@ -167,18 +182,24 @@ var/list/fish_items_list = list("goldfish" = /obj/item/weapon/fish/goldfish,
 	desc = "Apparently, catfish don't purr like you might have expected them to. Such a confusing name!"
 	icon_state = "catfish"
 	meat_type = /obj/item/weapon/reagent_containers/food/snacks/catfishmeat
+	weight = 6
+	length = 17
 
 /obj/item/weapon/fish/goldfish
 	name = "goldfish"
 	desc = "A goldfish, just like the one you never won at the county fair."
 	icon_state = "goldfish"
 	meat_type = /obj/item/weapon/reagent_containers/food/snacks/goldfishmeat
+	weight = 2
+	length = 8
 
 /obj/item/weapon/fish/salmon
 	name = "salmon"
 	desc = "The second-favorite food of Space Bears, right behind crew members."
 	icon_state = "salmon"
 	meat_type = /obj/item/weapon/reagent_containers/food/snacks/salmonmeat
+	weight = 11
+	length = 22
 
 /*/obj/item/weapon/fish/babycarp
 	name = "baby space carp"
