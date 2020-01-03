@@ -3,6 +3,8 @@
 #define TENSION_DELTA 15 // max rodtension decay per tick/max increase per attack_self
 #define FISHPULL_UPDATES 16 // amount of times the fish pulling code will tick during MAX_FISHING_TIME
 #define FISHPULL_BASELINE 40 // used in calculating pulling strength of a catch
+#define FISHPULL_MIN 20
+#define FISHPULL_MAX 60
 
 // -----------------------------
 //         Bait Datums
@@ -221,22 +223,21 @@
 				if(progbar)
 					progbar.loc = null
 	if(success)
-		return 1)
+		return 1
 	return 0
 
 // calculate the relative weight of the fish compared to the default weight value
 // this gets normalized where the default weight has a fishstrength of 40, lightest possible fish has fishstrength 20 and heaviest possible has fishstrength of 60
 /obj/item/weapon/fishingrod/proc/fish_pull()
-	if(hookeditem && istype(hookeditem, /obj/item/weapon/reagent_containers/food/snacks/fish))
-		var/obj/item/weapon/reagent_containers/food/snacks/fish/F = hookeditem
-		var/halfweight = initial(F.weight) / 2
-		// converts the fish weight into a range from 0.0 (lightest possible) to 1.0 (heaviest possible) and then normalises to 20-60 fish_strength scale
-		var/normalisedstrength = (F.weight - halfweight) / (initial(F.weight) * 1.5 - halfweight) * FISHPULL_BASELINE + (FISHPULL_BASELINE/2)
+	if(hookeditem && istype(hookeditem, /obj/item/weapon/fish))
+		var/obj/item/weapon/fish/F = hookeditem
+		// a heavier fish can pull harder
+		var/normalisedstrength = clamp(F.weight * FISHPULL_BASELINE, FISHPULL_MIN, FISHPULL_MAX)
 		other_pull(normalisedstrength)
 
 // accepts a value from 20-60 determining the strength of the fish on the line, 20 being the weakest value
 /obj/item/weapon/fishingrod/proc/other_pull(var/fish_strength)
-	var/pullamount = calculate_pull(Clamp(fish_strength, 20, 60))
+	var/pullamount = calculate_pull(clamp(fish_strength, 20, 60))
 	fishstage += pullamount
 	to_chat(world, "pullamount is [pullamount]")
 	to_chat(world, "<span class='warning'>rodtension is [rodtension]")
